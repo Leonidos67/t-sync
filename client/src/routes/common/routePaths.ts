@@ -1,0 +1,30 @@
+export const isAuthRoute = (pathname: string): boolean => {
+  return Object.values(AUTH_ROUTES).includes(pathname);
+};
+
+export const AUTH_ROUTES = {
+  SIGN_IN: "/",
+  SIGN_UP: "/sign-up",
+  GOOGLE_OAUTH_CALLBACK: "/google/oauth/callback",
+};
+
+export const PROTECTED_ROUTES = {
+  WORKSPACE: "/workspace/:workspaceId",
+  TASKS: "/workspace/:workspaceId/tasks",
+  MEMBERS: "/workspace/:workspaceId/members",
+  SETTINGS: "/workspace/:workspaceId/settings",
+  GENERAL_SETTINGS: "/workspace/:workspaceId/general-settings",
+  NOTIFICATIONS: "/workspace/:workspaceId/notifications",
+  USER_GUIDE: "/workspace/:workspaceId/user-guide",
+  PROJECT_DETAILS: "/workspace/:workspaceId/project/:projectId",
+  PROFILE: "/workspace/:workspaceId/profile",
+  REQUISITES: "/workspace/:workspaceId/requisites",
+  USAGE: "/workspace/:workspaceId/usage",
+  COMPLETED: "/workspace/:workspaceId/completed",
+  CREATE_WEBSITE: "/workspace/:workspaceId/create-website",
+  AI: "/workspace/:workspaceId/ai",
+};
+
+export const BASE_ROUTE = {
+  INVITE_URL: "/invite/workspace/:inviteCode/join",
+};

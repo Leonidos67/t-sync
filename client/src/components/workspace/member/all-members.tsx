@@ -29,6 +29,7 @@ const AllMembers = () => {
 
   const canChangeMemberRole = hasPermission(Permissions.CHANGE_MEMBER_ROLE);
   const isCoach = user?.userRole === "coach";
+  const canChange = canChangeMemberRole || isCoach;
 
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
@@ -82,7 +83,7 @@ const AllMembers = () => {
         const initials = getAvatarFallbackText(name);
         const avatarColor = getAvatarColor(name);
         return (
-          <div className="flex items-center justify-between space-x-4">
+          <div key={member.userId?._id || member._id} className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
               <Avatar className="h-8 w-8">
                 <AvatarImage
@@ -109,7 +110,7 @@ const AllMembers = () => {
                     className="ml-auto min-w-24 capitalize disabled:opacity-95 disabled:pointer-events-none"
                     disabled={
                       isLoading ||
-                      !canChangeMemberRole ||
+                      !canChange ||
                       member.userId._id === user?._id
                     }
                   >
@@ -120,12 +121,12 @@ const AllMembers = () => {
                       : member.role.name === "MEMBER"
                       ? isCoach ? "спортсмен" : "участник"
                       : member.role.name?.toLowerCase()}
-                    {canChangeMemberRole && member.userId._id !== user?._id && (
+                    {canChange && member.userId._id !== user?._id && (
                       <ChevronDown className="text-muted-foreground" />
                     )}
                   </Button>
                 </PopoverTrigger>
-                {canChangeMemberRole && (
+                {canChange && (
                   <PopoverContent className="p-0" align="end">
                     <Command>
                       <CommandInput
@@ -140,39 +141,39 @@ const AllMembers = () => {
                           <>
                             <CommandEmpty>No roles found.</CommandEmpty>
                             <CommandGroup>
-                              {roles?.map(
-                                (role) =>
-                                  role.name !== "OWNER" && (
-                                    <CommandItem
-                                      key={role._id}
-                                      disabled={isLoading}
-                                      className="disabled:pointer-events-none gap-1 mb-1  flex flex-col items-start px-4 py-2 cursor-pointer"
-                                      onSelect={() => {
-                                        handleSelect(
-                                          role._id,
-                                          member.userId._id
-                                        );
-                                      }}
-                                    >
-                                      <p className="capitalize">
-                                        {role.name === "OWNER"
-                                          ? "владелец"
-                                          : role.name === "ADMIN"
-                                          ? "админ"
-                                          : role.name === "MEMBER"
-                                          ? isCoach ? "спортсмен" : "участник"
-                                          : role.name?.toLowerCase()}
-                                      </p>
-                                      <p className="text-sm text-muted-foreground">
-                                        {role.name === "ADMIN" &&
-                                          `Может просматривать, создавать, редактировать комнаты, тренировки и управлять настройками.`}
+                              {(isCoach
+                                ? roles?.filter(r => r.name === "ADMIN" || r.name === "MEMBER")
+                                : roles?.filter(r => r.name !== "OWNER")
+                              )?.map((role) => (
+                                <CommandItem
+                                  key={role._id}
+                                  disabled={isLoading}
+                                  className="disabled:pointer-events-none gap-1 mb-1  flex flex-col items-start px-4 py-2 cursor-pointer"
+                                  onSelect={() => {
+                                    handleSelect(
+                                      role._id,
+                                      member.userId._id
+                                    );
+                                  }}
+                                >
+                                  <p className="capitalize">
+                                    {role.name === "OWNER"
+                                      ? "владелец"
+                                      : role.name === "ADMIN"
+                                      ? "админ"
+                                      : role.name === "MEMBER"
+                                      ? isCoach ? "спортсмен" : "участник"
+                                      : role.name?.toLowerCase()}
+                                  </p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {role.name === "ADMIN" &&
+                                      `Может просматривать, создавать, редактировать комнаты, тренировки и управлять настройками.`}
 
-                                        {role.name === "MEMBER" &&
-                                          `Может просматривать и редактировать только созданные им тренировки.`}
-                                      </p>
-                                    </CommandItem>
-                                  )
-                              )}
+                                    {role.name === "MEMBER" &&
+                                      `Может просматривать и редактировать только созданные им тренировки.`}
+                                  </p>
+                                </CommandItem>
+                              ))}
                             </CommandGroup>
                           </>
                         )}

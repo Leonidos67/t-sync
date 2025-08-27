@@ -37,8 +37,8 @@ export default function AiAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  const [showInput, setShowInput] = useState(false);
-  const [expandedRoom, setExpandedRoom] = useState<string | null>(null);
+  const [showInput, setShowInput] = useState(true);
+  const [expandedRoom, setExpandedRoom] = useState<{ messageIndex: number; roomId: string } | null>(null);
   const isMobile = useIsMobile();
   const [isAttachSheetOpen, setIsAttachSheetOpen] = useState(false);
   const [selectedAthletes, setSelectedAthletes] = useState<Array<{ _id: string; name: string; email: string }>>([]);
@@ -314,8 +314,12 @@ export default function AiAssistant() {
     }
   };
 
-  const toggleRoomExpansion = (roomId: string) => {
-    setExpandedRoom(expandedRoom === roomId ? null : roomId);
+  const toggleRoomExpansion = (messageIndex: number, roomId: string) => {
+    if (expandedRoom && expandedRoom.messageIndex === messageIndex && expandedRoom.roomId === roomId) {
+      setExpandedRoom(null);
+    } else {
+      setExpandedRoom({ messageIndex, roomId });
+    }
   };
 
   const handleRoomAction = (action: 'navigate' | 'ask', room: RoomOption) => {
@@ -350,34 +354,7 @@ export default function AiAssistant() {
     setSelectedAthletes(prev => prev.filter(a => a._id !== athleteId));
   };
 
-  if (!showInput) {
-    return (
-      <div className="relative w-full h-screen">
-        <div
-          className="fixed inset-0 z-0"
-          style={{
-            backgroundImage:
-              `radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.35), transparent 60%),` +
-              `radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.4), transparent 60%)`,
-          }}
-        />
-        <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-12">
-          <div className="lg:col-span-8 xl:col-span-8 lg:col-start-3 xl:col-start-3 flex items-center justify-center">
-            <button type="button" onClick={() => setShowInput(true)}>
-              <div className="relative">
-                <SiriOrb size="292px" />
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-                  <span className="text-white text-sm font-semibold text-center px-6 py-2 bg-black/80 rounded-full backdrop-blur-sm whitespace-nowrap">
-                    Задай мне любой вопрос
-                  </span>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Intro screen removed: we render chat UI immediately
 
   return (
     <div className="w-full relative m-0 p-0 ai-page">
@@ -393,7 +370,14 @@ export default function AiAssistant() {
         <div className="lg:col-span-8 xl:col-span-8 lg:col-start-3 xl:col-start-3">
           <div
             ref={messagesContainerRef}
-            className="space-y-3 px-3 lg:px-6 py-3 scrollbar"
+            className="space-y-3 px-3 lg:px-6 py-3 scrollbar no-scrollbar"
+            style={{
+              // Prevent content from being hidden behind the fixed input
+              paddingBottom: (inputBoxHeight || 0) + 8,
+              // Constrain to viewport and enable internal scroll
+              maxHeight: `calc(100vh - ${(inputBoxHeight || 0) + 24}px)`,
+              overflowY: 'auto',
+            }}
           >
             {messages.length === 0 && (
               <div className="w-full flex items-center justify-center py-12">
@@ -442,12 +426,12 @@ export default function AiAssistant() {
                                   variant="outline" 
                                   size="sm" 
                                   className="shrink-0" 
-                                  onClick={() => toggleRoomExpansion(room._id)}
+                                  onClick={() => toggleRoomExpansion(idx, room._id)}
                                 >
                                   <span className="mr-1">{room.emoji}</span>
                                   <span>{room.name}</span>
                                 </Button>
-                                {expandedRoom === room._id && (
+                                {expandedRoom && expandedRoom.messageIndex === idx && expandedRoom.roomId === room._id && (
                                                                   <div className="room-dropdown absolute top-full left-0 mt-1 bg-card border border-border rounded-md shadow-lg z-10 min-w-[200px]">
                                   <div className="py-1">
                                     <button
@@ -589,10 +573,24 @@ export default function AiAssistant() {
                   <div className="flex-1 overflow-y-auto space-y-2 pr-0 scrollbar">
                     {(membersData?.members ?? []).map((m) => {
                       const isSelected = selectedAthletes.find(a => a._id === m._id);
+                      const toggle = () => {
+                        if (isSelected) {
+                          removeAthlete(m._id);
+                        } else {
+                          addAthlete({ _id: m._id, name: m.userId?.name || "", email: m.userId?.email || "" });
+                        }
+                      };
                       return (
-                        <div key={m._id} className={`flex items-center justify-between gap-2 rounded-md border px-2 py-2 bg-white dark:bg-card text-foreground border-border hover:bg-accent hover:text-accent-foreground ${
-                          isSelected ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' : ''
-                        }`}>
+                        <div
+                          key={m._id}
+                          className={`flex items-center justify-between gap-2 rounded-md border px-2 py-2 bg-white dark:bg-card text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer ${
+                            isSelected ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' : ''
+                          }`}
+                          onClick={toggle}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } }}
+                        >
                           <span className="text-sm truncate text-foreground">
                             {m.userId?.name || m.userId?.email}
                           </span>
@@ -602,13 +600,7 @@ export default function AiAssistant() {
                                 ? "bg-green-500 text-white hover:bg-green-600" 
                                 : "bg-primary text-primary-foreground hover:opacity-90"
                             }`}
-                            onClick={() => {
-                              if (isSelected) {
-                                removeAthlete(m._id);
-                              } else {
-                                addAthlete({ _id: m._id, name: m.userId?.name || "", email: m.userId?.email || "" });
-                              }
-                            }}
+                            onClick={(e) => { e.stopPropagation(); toggle(); }}
                           >
                             {isSelected ? <Check className="size-3" /> : <Plus className="size-3" />}
                           </button>
@@ -650,21 +642,33 @@ export default function AiAssistant() {
         <BottomSheet
           open={isAttachSheetOpen}
           onOpenChange={setIsAttachSheetOpen}
-          title="Прикрепить спортсмена"
-          description="Выберите спортсмена из списка"
-          className="p-0"
+          className="p-0 px-4 pb-6"
         >
-          <div className="space-y-2">
+          <div className="space-y-3 mt-3">
             {(membersData?.members ?? []).length === 0 ? (
               <div className="text-sm text-muted-foreground py-4">Список спортсменов пуст</div>
             ) : (
-              <div className="max-h-[50vh] overflow-y-auto space-y-2 scrollbar">
+              <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-1 scrollbar">
                 {(membersData?.members ?? []).map((m) => {
                   const isSelected = selectedAthletes.find(a => a._id === m._id);
+                  const toggle = () => {
+                    if (isSelected) {
+                      removeAthlete(m._id);
+                    } else {
+                      addAthlete({ _id: m._id, name: m.userId?.name || "", email: m.userId?.email || "" });
+                    }
+                  };
                   return (
-                    <div key={m._id} className={`flex items-center justify-between gap-2 rounded-md border px-2 py-2 bg-white dark:bg-card text-foreground border-border hover:bg-accent hover:text-accent-foreground ${
-                      isSelected ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' : ''
-                    }`}>
+                    <div
+                      key={m._id}
+                      className={`flex items-center justify-between gap-2 rounded-md border px-2 py-2 bg-white dark:bg-card text-foreground border-border hover:bg-accent hover:text-accent-foreground cursor-pointer ${
+                        isSelected ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' : ''
+                      }`}
+                      onClick={toggle}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } }}
+                    >
                       <span className="text-sm truncate text-foreground">
                         {m.userId?.name || m.userId?.email}
                       </span>
@@ -674,13 +678,7 @@ export default function AiAssistant() {
                             ? "bg-green-500 text-white hover:bg-green-600" 
                             : "bg-primary text-primary-foreground hover:opacity-90"
                         }`}
-                        onClick={() => {
-                          if (isSelected) {
-                            removeAthlete(m._id);
-                          } else {
-                            addAthlete({ _id: m._id, name: m.userId?.name || "", email: m.userId?.email || "" });
-                          }
-                        }}
+                        onClick={(e) => { e.stopPropagation(); toggle(); }}
                       >
                         {isSelected ? <Check className="size-3" /> : <Plus className="size-3" />}
                       </button>

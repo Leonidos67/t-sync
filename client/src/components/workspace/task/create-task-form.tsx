@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "../../ui/textarea";
-import { Separator } from "@/components/ui/separator";
+// import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -413,7 +413,7 @@ export default function CreateTaskForm(props: {
             {/* {isMobile && <Separator className="my-4" />} */}
 
             <Button
-              className="flex place-self-end  h-[40px] text-black font-semibold"
+              className="flex place-self-end  h-[40px] text-white font-semibold"
               type="submit"
               disabled={isPending}
             >

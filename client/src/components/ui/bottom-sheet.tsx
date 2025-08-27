@@ -6,6 +6,7 @@ import {
   SheetContent,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 
 type BottomSheetProps = {
@@ -15,6 +16,8 @@ type BottomSheetProps = {
   className?: string;
   swipeToClose?: boolean;
   swipeCloseThreshold?: number; // pixels
+  title?: string;
+  description?: string;
 };
 
 const BottomSheet: React.FC<BottomSheetProps> = ({
@@ -24,6 +27,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
   className,
   swipeToClose = true,
   swipeCloseThreshold = 140,
+  title,
+  description,
 }) => {
   const [dragY, setDragY] = useState(0);
   const startYRef = useRef<number | null>(null);
@@ -92,10 +97,24 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         </div>
         
         {/* Разделитель после блока для свайпа с отступами как в быстром доступе */}
-        <div className="mt-6">
+        <div className="mt-6 mb-0">
           <Separator />
         </div>
         
+        {/* Accessible header for screen readers (and visible by default) */}
+        {(title || description) && (
+          <div className="px-4 pt-4">
+            <SheetHeader>
+              {title ? (
+                <SheetTitle>{title}</SheetTitle>
+              ) : null}
+              {description ? (
+                <SheetDescription>{description}</SheetDescription>
+              ) : null}
+            </SheetHeader>
+          </div>
+        )}
+
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

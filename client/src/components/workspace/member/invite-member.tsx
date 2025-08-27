@@ -15,11 +15,9 @@ const InviteMember = () => {
 
   const isCoach = user?.userRole === "coach";
 
-  const inviteUrl = workspace
-    ? `${window.location.origin}${BASE_ROUTE.INVITE_URL.replace(
-        ":inviteCode",
-        workspace.inviteCode
-      )}`
+  const inviteCode = workspace?.inviteCode || user?.currentWorkspace?.inviteCode || "";
+  const inviteUrl = inviteCode
+    ? `${window.location.origin}${BASE_ROUTE.INVITE_URL.replace(":inviteCode", inviteCode)}`
     : "";
 
   const handleCopy = () => {
@@ -46,8 +44,8 @@ const InviteMember = () => {
       Вы также можете отключить и создать новую ссылку для этого рабочего пространства в любое время.
       </p>
 
-      <PermissionsGuard showMessage requiredPermission={Permissions.ADD_MEMBER}>
-        {workspaceLoading ? (
+      {isCoach ? (
+        workspaceLoading ? (
           <Loader
             className="w-8 h-8 
         animate-spin
@@ -67,7 +65,7 @@ const InviteMember = () => {
               readOnly
             />
             <Button
-              disabled={false}
+              disabled={!inviteUrl}
               className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
               size="icon"
               onClick={handleCopy}
@@ -75,8 +73,40 @@ const InviteMember = () => {
               {copied ? <CheckIcon /> : <CopyIcon />}
             </Button>
           </div>
-        )}
-      </PermissionsGuard>
+        )
+      ) : (
+        <PermissionsGuard showMessage requiredPermission={Permissions.ADD_MEMBER}>
+          {workspaceLoading ? (
+            <Loader
+              className="w-8 h-8 
+        animate-spin
+        place-self-center
+        flex"
+            />
+          ) : (
+            <div className="flex py-3 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Link
+              </Label>
+              <Input
+                id="link"
+                disabled={true}
+                className="disabled:opacity-100 disabled:pointer-events-none"
+                value={inviteUrl}
+                readOnly
+              />
+              <Button
+                disabled={!inviteUrl}
+                className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
+                size="icon"
+                onClick={handleCopy}
+              >
+                {copied ? <CheckIcon /> : <CopyIcon />}
+              </Button>
+            </div>
+          )}
+        </PermissionsGuard>
+      )}
     </div>
   );
 };

@@ -9,44 +9,47 @@ import {
 import AppLayout from "@/layout/app.layout";
 import BaseLayout from "@/layout/base.layout";
 import NotFound from "@/page/errors/NotFound";
+import { AuthProvider } from "@/context/auth-provider";
 
 function AppRoutes() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<BaseLayout />}>
-          {baseRoutePaths.map((route) => (
-            <Route key={route.path} path={route.path} element={route.element} />
-          ))}
-        </Route>
-
-        <Route path="/" element={<AuthRoute />}>
+      <AuthProvider>
+        <Routes>
           <Route element={<BaseLayout />}>
-            {authenticationRoutePaths.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
+            {baseRoutePaths.map((route) => (
+              <Route key={route.path} path={route.path} element={route.element} />
             ))}
           </Route>
-        </Route>
 
-        {/* Protected Route */}
-        <Route path="/" element={<ProtectedRoute />}>
-          <Route element={<AppLayout />}>
-            {protectedRoutePaths.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
+          <Route path="/" element={<AuthRoute />}>
+            <Route element={<BaseLayout />}>
+              {authenticationRoutePaths.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Route>
           </Route>
-        </Route>
-        {/* Catch-all for undefined routes */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+
+          {/* Protected Route */}
+          <Route path="/" element={<ProtectedRoute />}>
+            <Route element={<AppLayout />}>
+              {protectedRoutePaths.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Route>
+          </Route>
+          {/* Catch-all for undefined routes */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

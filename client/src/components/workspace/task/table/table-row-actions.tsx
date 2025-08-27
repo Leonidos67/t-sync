@@ -19,6 +19,8 @@ import { deleteTaskMutationFn, editTaskMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import EditTaskDialog from "../edit-task-dialog"; // Import the Edit Dialog
 import { TaskStatusEnum, TaskStatusEnumType } from "@/constant";
+import { useAuthContext } from "@/context/auth-provider";
+import { Permissions as AppPermissions } from "@/constant";
 
 interface DataTableRowActionsProps {
   row: Row<TaskType>;
@@ -32,6 +34,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
+  const { hasPermission } = useAuthContext();
 
   const { mutate, isPending } = useMutation({
     mutationFn: deleteTaskMutationFn,
@@ -47,6 +50,16 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const projectId = task.project?._id || "";
 
   const handleConfirm = () => {
+    if (!hasPermission(AppPermissions.DELETE_TASK)) {
+      toast({
+        title: "Уведомление",
+        description:
+          "Удалять тренировки могут только администратор или владелец. У вас нет прав.",
+        variant: "destructive",
+      });
+      setOpenDialog(false);
+      return;
+    }
     mutate(
       { workspaceId, taskId },
       {
@@ -56,7 +69,11 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           setTimeout(() => setOpenDialog(false), 100);
         },
         onError: (error) => {
-          toast({ title: "Уведомление", description: error.message, variant: "destructive" });
+          const message =
+            (error as any)?.errorCode === "ACCESS_UNAUTHORIZED"
+              ? "Удалять тренировки могут только администратор или владелец. У вас нет прав."
+              : (error as any)?.message || "Ошибка удаления";
+          toast({ title: "Уведомление", description: message, variant: "destructive" });
         },
       }
     );
@@ -147,7 +164,18 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             {/* Delete Task Option */}
             <DropdownMenuItem
               className="!text-destructive cursor-pointer"
-              onClick={() => setOpenDialog(true)}
+              onClick={() => {
+                if (!hasPermission(AppPermissions.DELETE_TASK)) {
+                  toast({
+                    title: "Уведомление",
+                    description:
+                      "Удалять тренировки могут только администратор или владелец. У вас нет прав.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                setOpenDialog(true);
+              }}
             >
               Удалить
               <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>

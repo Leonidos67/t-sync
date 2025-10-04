@@ -18,6 +18,7 @@ import {
   CreateWebsiteType,
   CreateWebsiteResponseType,
   GetWebsiteByUsernameResponseType,
+  CreateWorkspaceType,
 } from "../types/api.type";
 import {
   AllWorkspaceResponseType,
@@ -323,6 +324,39 @@ export const updateProfilePictureMutationFn = async (profilePicture: string) => 
 export const setUsernameMutationFn = async (username: string) => {
   const response = await API.patch("/user/set-username", { username });
   return response.data;
+};
+
+export const updatePersonalDataMutationFn = async (data: {
+  phoneNumber?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  birthDate?: string;
+  city?: string;
+}) => {
+  const response = await API.patch("/user/personal-data", data);
+  return response.data;
+};
+
+export const updateNotificationSettingsMutationFn = async (data: {
+  email?: boolean;
+  push?: boolean;
+  tasks?: boolean;
+  newTasks?: boolean;
+  taskUpdates?: boolean;
+  projectUpdates?: boolean;
+}) => {
+  const response = await API.patch("/user/notification-settings", data);
+  return response.data;
+};
+
+export const changePasswordMutationFn = async (data: {
+  currentPassword: string;
+  newPassword: string;
+}) => {
+  const response = await API.patch("/user/change-password", data);
+  return response.data as { message: string };
 };
 
 export const getFollowersQueryFn = async (username: string) => {

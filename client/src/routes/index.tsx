@@ -9,13 +9,21 @@ import {
 import AppLayout from "@/layout/app.layout";
 import BaseLayout from "@/layout/base.layout";
 import NotFound from "@/page/errors/NotFound";
+import Creatium from "@/page/creatium/Creatium";
+import CreatiumCreate from "@/page/creatium/CreatiumCreate";
 import { AuthProvider } from "@/context/auth-provider";
+import { PinnedWorkspacesProvider } from "@/context/pinned-workspaces-provider";
+import AuthGuard from "@/components/auth-guard";
 
 function AppRoutes() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
+        <PinnedWorkspacesProvider>
+          <Routes>
+          {/* Standalone service route without platform layouts */}
+          <Route path="/creatium" element={<AuthGuard><Creatium /></AuthGuard>} />
+          <Route path="/creatium/create" element={<AuthGuard><CreatiumCreate /></AuthGuard>} />
           <Route element={<BaseLayout />}>
             {baseRoutePaths.map((route) => (
               <Route key={route.path} path={route.path} element={route.element} />
@@ -49,6 +57,7 @@ function AppRoutes() {
           {/* Catch-all for undefined routes */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </PinnedWorkspacesProvider>
       </AuthProvider>
     </BrowserRouter>
   );

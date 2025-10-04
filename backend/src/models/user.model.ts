@@ -15,6 +15,29 @@ export interface UserDocument extends Document {
   isNewUser: boolean;
   onboardingAnswer?: string | null;
   userRole?: "coach" | "athlete" | null; // роль пользователя: тренер или спортсмен
+  // Личные данные
+  phoneNumber?: string | null;
+  firstName?: string;
+  lastName?: string;
+  gender?: "male" | "female" | null;
+  birthDate?: string | null;
+  city?: string | null;
+  websiteData?: {
+    title: string;
+    description: string;
+    about: string;
+    gallery: string[];
+    isPublished: boolean;
+  };
+  // Настройки уведомлений
+  notificationSettings?: {
+    email: boolean;
+    push: boolean;
+    tasks: boolean;
+    newTasks: boolean;
+    taskUpdates: boolean;
+    projectUpdates: boolean;
+  };
   comparePassword(value: string): Promise<boolean>;
   omitPassword(): Omit<UserDocument, "password">;
 }
@@ -57,6 +80,33 @@ const userSchema = new Schema<UserDocument>(
       type: String, 
       enum: ["coach", "athlete", null], 
       default: null 
+    },
+    // Личные данные
+    phoneNumber: { type: String, default: null },
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
+    gender: { 
+      type: String, 
+      enum: ["male", "female", null], 
+      default: null 
+    },
+    birthDate: { type: String, default: null },
+    city: { type: String, default: null },
+    websiteData: {
+      title: { type: String, default: "" },
+      description: { type: String, default: "" },
+      about: { type: String, default: "" },
+      gallery: [{ type: String }],
+      isPublished: { type: Boolean, default: false }
+    },
+    // Настройки уведомлений
+    notificationSettings: {
+      email: { type: Boolean, default: true },
+      push: { type: Boolean, default: true },
+      tasks: { type: Boolean, default: true },
+      newTasks: { type: Boolean, default: true },
+      taskUpdates: { type: Boolean, default: true },
+      projectUpdates: { type: Boolean, default: true }
     },
   },
   {

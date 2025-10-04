@@ -2,6 +2,8 @@ import GoogleOAuthFailure from "@/page/auth/GoogleOAuthFailure";
 import SignIn from "@/page/auth/Sign-in";
 import SignUp from "@/page/auth/Sign-up";
 import WorkspaceDashboard from "@/page/workspace/Dashboard";
+import WorkspaceWelcome from "@/page/workspace/Welcome";
+import React from "react";
 import Members from "@/page/workspace/Members";
 import ProjectDetails from "@/page/workspace/ProjectDetails";
 import Settings from "@/page/workspace/Settings";
@@ -20,6 +22,8 @@ import UserProfile from "@/page/users/Profile";
 import SocialMainPage from "@/page/users/index";
 import PublicWebsitePage from "@/page/website/PublicWebsite";
 import AiAssistant from "@/page/ai/Assistant";
+import AuthGuard from "@/components/auth-guard";
+import IdPage from "@/page/id";
 
 export const authenticationRoutePaths = [
   { path: AUTH_ROUTES.SIGN_IN, element: <SignIn /> },
@@ -28,6 +32,8 @@ export const authenticationRoutePaths = [
 ];
 
 export const protectedRoutePaths = [
+  { path: "/workspace/welcome", element: <WorkspaceWelcome /> },
+  { path: "/workspace/:workspaceId", element: <WorkspaceWelcome /> },
   { path: PROTECTED_ROUTES.WORKSPACE, element: <WorkspaceDashboard /> },
   { path: PROTECTED_ROUTES.TASKS, element: <Tasks /> },
   { path: PROTECTED_ROUTES.MEMBERS, element: <Members /> },
@@ -46,8 +52,14 @@ export const protectedRoutePaths = [
 
 export const baseRoutePaths = [
   { path: BASE_ROUTE.INVITE_URL, element: <InviteUser /> },
-  { path: "/u/", element: <SocialMainPage /> },
-  { path: "/u/users", element: <UsersListPage /> },
-  { path: "/u/users/:username", element: <UserProfile /> },
+  { path: "/id", element: <AuthGuard><IdPage /></AuthGuard> },
+  { path: "/u/", element: <AuthGuard><SocialMainPage /></AuthGuard> },
+  { path: "/u/users", element: <AuthGuard><UsersListPage /></AuthGuard> },
+  { path: "/u/users/:username", element: <AuthGuard><UserProfile /></AuthGuard> },
   { path: "/web/:username", element: <PublicWebsitePage /> },
 ];
+
+function WorkspaceHomeRedirect() {
+  const { workspaceId } = useParams();
+  return <Navigate to={`/workspace/${workspaceId}/home`} replace />;
+}

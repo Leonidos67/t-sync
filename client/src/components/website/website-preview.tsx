@@ -154,7 +154,7 @@ const WebsitePreview: React.FC<WebsitePreviewProps> = ({
       </div>
 
       {/* Галерея */}
-      {website.gallery.length > 0 && (
+      {website.gallery && website.gallery.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold mb-3">Галерея</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

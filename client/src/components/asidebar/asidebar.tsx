@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from "@/components/logo";
 import { EllipsisIcon, Loader, LogOut, User as UserIcon } from "lucide-react";
 import {
   Sidebar,
@@ -23,7 +24,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Logo from "@/components/logo";
 import LogoutDialog from "./logout-dialog";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { NavMain } from "./nav-main";
@@ -45,21 +45,21 @@ const Asidebar = () => {
     <>
       <div className="flex h-full min-h-screen">
         <Sidebar collapsible="icon" className="flex-grow h-auto">
-          <SidebarHeader className="!py-0 dark:bg-background">
+          <SidebarHeader className="!py-0 bg-sidebar-background">
             <div className="flex h-[50px] items-center justify-start w-full px-1">
-              <Logo url={`/workspace/${workspaceId}`} />
+              <Logo url={`/workspace/${workspaceId}/home`} />
               {open && (
                 <Link
-                  to={`/workspace/${workspaceId}`}
-                  className=" md:flex ml-2 items-center gap-2 self-center font-medium"
+                  to={`/workspace/${workspaceId}/home`}
+                  className=" md:flex ml-2 items-center gap-2 self-center font-medium text-sidebar-foreground"
                 >
                   T-Sync
-                  <span className="px-2 py-0.5 rounded-full bg-foreground text-background text-xs font-semibold">beta</span>
+                  <span className="px-2 py-0.5 rounded-full bg-sidebar-primary text-sidebar-primary-foreground text-xs font-semibold">beta</span>
                 </Link>
               )}
             </div>
           </SidebarHeader>
-          <SidebarContent className=" !mt-0 dark:bg-background">
+          <SidebarContent className=" !mt-0 bg-sidebar-background">
             <SidebarGroup className="!py-0">
               <SidebarGroupContent>
                 <WorkspaceSwitcher />
@@ -70,7 +70,7 @@ const Asidebar = () => {
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
-          <SidebarFooter className="dark:bg-background">
+          <SidebarFooter className="bg-sidebar-background">
             <SidebarMenu className={`transition-transform duration-200 ${!open ? '-translate-x-0' : ''}`}>
               <SidebarMenuItem>
                 {isLoading ? (
@@ -87,18 +87,18 @@ const Asidebar = () => {
                       >
                         <Avatar className="h-8 w-8 rounded-full">
                           <AvatarImage src={user?.profilePicture || ""} />
-                          <AvatarFallback className="rounded-full border border-gray-500">
+                          <AvatarFallback className="rounded-full border border-border">
                             {user?.name?.split(" ")?.[0]?.charAt(0)}
                             {user?.name?.split(" ")?.[1]?.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-semibold">
+                          <span className="truncate font-semibold text-sidebar-foreground">
                             {user?.name}
                           </span>
-                          <span className="truncate text-xs">{user?.email}</span>
+                          <span className="truncate text-xs text-sidebar-foreground/70">{user?.email}</span>
                         </div>
-                        <EllipsisIcon className="ml-auto size-4" />
+                        <EllipsisIcon className="ml-auto size-4 text-sidebar-foreground" />
                       </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

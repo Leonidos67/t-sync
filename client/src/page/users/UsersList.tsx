@@ -39,7 +39,7 @@ const UsersListPage = () => {
   return (
     <>
       <SocialHeader />
-      <div className="flex min-h-svh bg-muted">
+      <div className="tsygram-dark flex min-h-svh bg-background">
         {/* Левая колонка */}
         <SocialSidebarMenu />
         {/* Центр: список пользователей */}

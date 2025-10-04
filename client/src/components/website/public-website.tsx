@@ -70,7 +70,7 @@ const PublicWebsite: React.FC<PublicWebsiteProps> = ({ website, username }) => {
 
       {/* Основной контент */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Заголовок сайта */}
+        {/* Название */}
         <Card className="p-8 mb-8 text-center bg-white shadow-lg">
           <div className="mb-6">
             {website.profileImage && (
@@ -152,7 +152,7 @@ const PublicWebsite: React.FC<PublicWebsiteProps> = ({ website, username }) => {
           </div>
           
           <p className="text-sm text-gray-500">
-            Сайт создан с помощью <a className='text-black' target='_blank' href="https://t-sync.ru">T-Sync</a>
+            Сайт создан с помощью <a className='text-black' target='_blank' href="https://t-sync-web.vercel.app">T-Sync</a>
           </p>
           
           <div className="mt-4">

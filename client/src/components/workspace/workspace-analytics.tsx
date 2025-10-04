@@ -11,12 +11,13 @@ const WorkspaceAnalytics = () => {
     queryFn: () => getWorkspaceAnalyticsQueryFn(workspaceId),
     staleTime: 0,
     enabled: !!workspaceId,
+    refetchOnMount: true,
   });
 
   const analytics = data?.analytics;
 
   return (
-    <div className="grid gap-4 md:gap-5 lg:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 md:gap-5 lg:grid-cols-2 xl:grid-cols-4">
       <AnalyticsCard
         isLoading={isPending}
         title="Все тренировки"
@@ -24,12 +25,20 @@ const WorkspaceAnalytics = () => {
       />
       <AnalyticsCard
         isLoading={isPending}
-        title="Просроченные тренировки"
+        title="Актуальные"
+        value={Math.max(
+          0,
+          (analytics?.totalTasks || 0) - (analytics?.completedTasks || 0) - (analytics?.overdueTasks || 0)
+        )}
+      />
+      <AnalyticsCard
+        isLoading={isPending}
+        title="Просроченные"
         value={analytics?.overdueTasks || 0}
       />
       <AnalyticsCard
         isLoading={isPending}
-        title="Выполненные тренировки"
+        title="Выполненные"
         value={analytics?.completedTasks || 0}
       />
     </div>

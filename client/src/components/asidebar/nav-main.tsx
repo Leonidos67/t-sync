@@ -13,6 +13,8 @@ import { AnimatedBolt } from "@/components/ui/motion/AnimatedBolt";
 import { AnimatedSwatchBook } from "@/components/ui/motion/AnimatedSwatchBook";
 import { AnimatedWand } from "@/components/ui/motion/AnimatedWand";
 import { AudioLines } from "@/components/ui/motion/AudioLines";
+import { AnimatedBookMarked } from "@/components/ui/motion/AnimatedBookMarked";
+import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import {
@@ -52,6 +54,7 @@ export function NavMain({ compact = false, onItemClick }: NavMainProps) {
   const [isSettingsAnimating, setIsSettingsAnimating] = React.useState(false);
   const [isUserGuideAnimating, setIsUserGuideAnimating] = React.useState(false);
   const [isAiAnimating, setIsAiAnimating] = React.useState(false);
+  const [isNotificationsAnimating, setIsNotificationsAnimating] = React.useState(false);
 
   const pathname = location.pathname;
   const isCoach = user?.userRole === "coach";
@@ -59,9 +62,15 @@ export function NavMain({ compact = false, onItemClick }: NavMainProps) {
   const mainItems: ItemType[] = [
     {
       title: "Главная",
-      url: `/workspace/${workspaceId}`,
+      url: `/workspace/${workspaceId}/home`,
       icon: AnimatedLayoutGrid,
       isAnimated: true,
+    },
+    {
+      title: "T-Sync ID",
+      url: "/u/",
+      icon: User,
+      isAnimated: false,
     },
     {
       title: "Мои данные",
@@ -195,6 +204,20 @@ export function NavMain({ compact = false, onItemClick }: NavMainProps) {
             <Link to={`/workspace/${workspaceId}/user-guide`} className="!text-[15px]" onClick={onItemClick}>
               <AnimatedSwatchBook isAnimating={isUserGuideAnimating} />
               <span>Руководство</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        
+        <SidebarMenuItem>
+          <SidebarMenuButton 
+            isActive={pathname.includes("/notifications")} 
+            asChild
+            onMouseEnter={() => setIsNotificationsAnimating(true)}
+            onMouseLeave={() => setIsNotificationsAnimating(false)}
+          >
+            <Link to={`/workspace/${workspaceId}/notifications`} className="!text-[15px]" onClick={onItemClick}>
+              <AnimatedBookMarked isAnimating={isNotificationsAnimating} />
+              <span>Уведомления</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

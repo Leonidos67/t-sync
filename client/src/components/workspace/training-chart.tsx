@@ -87,6 +87,7 @@ const TrainingChart = () => {
     queryFn: () => getWorkspaceWeeklyAnalyticsQueryFn(workspaceId, currentWeek),
     staleTime: 0,
     enabled: !!workspaceId,
+    refetchOnMount: true,
   });
 
   const weeklyData = data?.weeklyData || [];

@@ -133,7 +133,7 @@ const Header = () => {
               <BreadcrumbItem className="text-[15px]">
                 {pageHeading ? (
                   <BreadcrumbLink asChild>
-                    <Link to={`/workspace/${workspaceId}`}>Главная</Link>
+                    <Link to={`/workspace/${workspaceId}/home`}>Главная</Link>
                   </BreadcrumbLink>
                 ) : (
                   <BreadcrumbPage className="line-clamp-1 ">
@@ -154,12 +154,9 @@ const Header = () => {
               )}
             </BreadcrumbList>
           </Breadcrumb>
+          
           {/* Кнопка Меню команд и модалка */}
           <div className="ml-2 flex items-center gap-2">
-
-
-
-
             {/* Мобильная версия - кнопка Еще */}
             <div className="md:hidden">
               <DropdownMenu>

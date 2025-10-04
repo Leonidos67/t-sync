@@ -17,7 +17,11 @@ import { useState } from "react";
 import ViewTaskDialog from "@/components/workspace/task/view-task-dialog";
 import { Link } from "react-router-dom";
 
-const RecentTasks = () => {
+type RecentTasksProps = {
+  mode?: "active" | "overdue";
+};
+
+const RecentTasks = ({ mode = "active" }: RecentTasksProps) => {
   const workspaceId = useWorkspaceId();
   const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -34,8 +38,22 @@ const RecentTasks = () => {
 
   const allTasks: TaskType[] = data?.tasks || [];
   
-  // Фильтруем задачи, исключая выполненные (DONE)
-  const tasks: TaskType[] = allTasks.filter(task => task.status !== TaskStatusEnum.DONE);
+  // Фильтруем задачи в зависимости от режима: актуальные или просроченные
+  const tasks: TaskType[] = allTasks.filter((task) => {
+    const isDone = task.status === TaskStatusEnum.DONE;
+    const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+    const now = new Date();
+    const isOverdueByDate = Boolean(dueDate && dueDate < now && !isDone);
+    const statusLabel = transformStatusEnum(task.status);
+    const isOverdueByStatus = statusLabel === "Просроченная тренировка";
+
+    if (mode === "overdue") {
+      return !isDone && (isOverdueByDate || isOverdueByStatus);
+    }
+
+    // mode === "active"
+    return !isDone && !isOverdueByDate && !isOverdueByStatus;
+  });
 
   const handleViewTask = (task: TaskType) => {
     setSelectedTask(task);
@@ -59,7 +77,9 @@ const RecentTasks = () => {
           text-sm text-muted-foreground
           text-center py-5"
         >
-          Актуальные тренировки не найдены
+          {mode === "overdue"
+            ? "Просроченные тренировки не найдены"
+            : "Актуальные тренировки не найдены"}
         </div>
       )}
 

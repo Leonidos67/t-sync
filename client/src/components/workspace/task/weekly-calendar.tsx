@@ -8,11 +8,18 @@ import {
   parseISO,
 } from "date-fns";
 import { ru } from "date-fns/locale";
-import { Plus, MoreHorizontal } from "lucide-react";
+import { Plus, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import useWorkspaceId from "@/hooks/use-workspace-id";
+import EditTaskDialog from "./edit-task-dialog";
+import { ConfirmDialog } from "@/components/resuable/confirm-dialog";
+import { useAuthContext } from "@/context/auth-provider";
+import { Permissions as AppPermissions } from "@/constant";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteTaskMutationFn } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 type WeeklyCalendarProps = {
   tasks: TaskType[];
@@ -27,7 +34,16 @@ function getStartOfCurrentWeek(date = new Date()): Date {
 export default function WeeklyCalendar({ tasks, onCreateTask }: WeeklyCalendarProps) {
   const navigate = useNavigate();
   const workspaceId = useWorkspaceId();
-  const weekStart = React.useMemo(() => getStartOfCurrentWeek(), []);
+  const queryClient = useQueryClient();
+  const { hasPermission, user, workspace } = useAuthContext();
+
+  const [taskForEdit, setTaskForEdit] = React.useState<TaskType | null>(null);
+  const [taskForDelete, setTaskForDelete] = React.useState<TaskType | null>(null);
+
+  const { mutate: deleteTask, isPending: isDeletePending } = useMutation({
+    mutationFn: deleteTaskMutationFn,
+  });
+  const [weekStart, setWeekStart] = React.useState<Date>(getStartOfCurrentWeek());
 
   const days = React.useMemo(
     () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
@@ -52,6 +68,55 @@ export default function WeeklyCalendar({ tasks, onCreateTask }: WeeklyCalendarPr
     if (onCreateTask) {
       onCreateTask(date);
     }
+  };
+
+  const handlePrevWeek = () => {
+    setWeekStart((prev) => addDays(prev, -7));
+  };
+
+  const handleNextWeek = () => {
+    setWeekStart((prev) => addDays(prev, 7));
+  };
+
+  const handleToday = () => {
+    setWeekStart(getStartOfCurrentWeek());
+  };
+
+  const isCurrentWeek = React.useMemo(() =>
+    isSameDay(weekStart, getStartOfCurrentWeek()),
+  [weekStart]
+  );
+
+  const handleConfirmDelete = () => {
+    if (!taskForDelete) return;
+    const isOwner = user?._id && workspace?.owner && user._id === workspace.owner;
+    if (!hasPermission(AppPermissions.DELETE_TASK) && !isOwner) {
+      toast({
+        title: "Уведомление",
+        description:
+          "Удалять тренировки могут только администратор или владелец. У вас нет прав.",
+        variant: "destructive",
+      });
+      setTaskForDelete(null);
+      return;
+    }
+    deleteTask(
+      { workspaceId, taskId: taskForDelete._id as string },
+      {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({ queryKey: ["all-tasks", workspaceId] });
+          toast({ title: "Уведомление", description: data.message, variant: "success" });
+          setTaskForDelete(null);
+        },
+        onError: (error: any) => {
+          const message =
+            error?.errorCode === "ACCESS_UNAUTHORIZED"
+              ? "Удалять тренировки могут только администратор или владелец. У вас нет прав."
+              : error?.message || "Ошибка удаления";
+          toast({ title: "Уведомление", description: message, variant: "destructive" });
+        },
+      }
+    );
   };
 
   return (
@@ -125,20 +190,13 @@ export default function WeeklyCalendar({ tasks, onCreateTask }: WeeklyCalendarPr
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="cursor-pointer"
-                            onClick={() => {
-                              // TODO: open edit dialog when available
-                              navigate(`/workspace/${workspaceId}/tasks`, { state: { editTaskId: task._id } });
-                            }}
+                            onClick={() => setTaskForEdit(task)}
                           >
                             Редактировать
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="cursor-pointer text-red-600 focus:text-red-700"
-                            onClick={() => {
-                              // TODO: wire real delete with confirmation
-                              const event = new CustomEvent("task-delete-request", { detail: { taskId: task._id } });
-                              window.dispatchEvent(event);
-                            }}
+                            onClick={() => setTaskForDelete(task)}
                           >
                             Удалить
                           </DropdownMenuItem>
@@ -152,6 +210,45 @@ export default function WeeklyCalendar({ tasks, onCreateTask }: WeeklyCalendarPr
           </div>
         ))}
       </div>
+
+      <div className="mt-3 flex items-center justify-center gap-3">
+        <Button variant="outline" size="icon" onClick={handlePrevWeek} aria-label="Предыдущая неделя">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant={isCurrentWeek ? "outline" : "secondary"}
+          onClick={handleToday}
+          aria-label="Перейти к текущей неделе"
+          disabled={isCurrentWeek}
+          className={isCurrentWeek ? "cursor-not-allowed opacity-70" : ""}
+        >
+          Сегодня
+        </Button>
+        <Button variant="outline" size="icon" onClick={handleNextWeek} aria-label="Следующая неделя">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Edit Task Dialog */}
+      {taskForEdit && (
+        <EditTaskDialog
+          task={taskForEdit}
+          isOpen={!!taskForEdit}
+          onClose={() => setTaskForEdit(null)}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!taskForDelete}
+        isLoading={isDeletePending}
+        onClose={() => setTaskForDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Удаление тренировки"
+        description={taskForDelete ? `Вы действительно хотите удалить "${taskForDelete.title || taskForDelete._id}"?` : ""}
+        confirmText="Удалить"
+        cancelText="Отменить"
+      />
     </div>
   );
 }

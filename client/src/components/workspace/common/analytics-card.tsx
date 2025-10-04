@@ -16,7 +16,11 @@ const AnalyticsCard = (props: {
         <ArrowBigUp strokeWidth={2.5} className="h-4 w-4 text-green-500" />
       );
     }
-    if (title === "Выполненные тренировки" || title === "Все тренировки") {
+    if (
+      title === "Выполненные тренировки" ||
+      title === "Все тренировки" ||
+      title === "Актуальные тренировки"
+    ) {
       return value > 0 ? (
         <ArrowBigUp strokeWidth={2.5} className="h-4 w-4 text-green-500" />
       ) : (

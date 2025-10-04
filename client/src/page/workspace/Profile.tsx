@@ -353,10 +353,7 @@ const Profile = () => {
           </div>
         </div>
         
-        {/* Секция управления сайтом */}
-        <div className="w-full mt-6">
-          <WebsiteManager />
-        </div>
+        {/* Секция управления сайтом удалена по запросу */}
         
         <Button variant="default" className="mt-6" onClick={() => setIsLogoutOpen(true)}>
           Выйти из аккаунта

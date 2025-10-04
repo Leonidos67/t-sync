@@ -11,7 +11,6 @@ import { ConfirmDialog } from "@/components/resuable/confirm-dialog";
 import SocialHeader, { SocialSidebarMenu } from "@/components/social-header";
 import { getFollowingQueryFn } from "@/lib/api";
 import { EllipsisVertical, Globe } from "lucide-react";
-import WebsiteManager from "@/components/website/website-manager";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
@@ -64,7 +63,6 @@ const UserProfile = () => {
   const [deletePostId, setDeletePostId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [following, setFollowing] = useState<FollowerUser[]>([]);
-  const [hasWebsite, setHasWebsite] = useState(false);
 
   useEffect(() => {
     if (!username) return;
@@ -97,16 +95,6 @@ const UserProfile = () => {
         .catch(() => setFollowing([]));
     }
 
-    // Проверить наличие сайта у пользователя
-    const checkWebsite = () => {
-      try {
-        const websites = JSON.parse(localStorage.getItem('websites') || '{}');
-        setHasWebsite(!!websites[username]);
-      } catch {
-        setHasWebsite(false);
-      }
-    };
-    checkWebsite();
   }, [username, currentUser]);
 
   // Получение постов
@@ -200,7 +188,7 @@ const UserProfile = () => {
   return (
     <>
       <SocialHeader />
-      <div className="flex min-h-svh bg-muted">
+      <div className="tsygram-dark flex min-h-svh bg-background">
         {/* Левая колонка */}
         <SocialSidebarMenu />
         {/* Центр: профиль */}
@@ -231,47 +219,23 @@ const UserProfile = () => {
                     </TooltipProvider>
                   )}
                 </div>
-                <div className="text-blue-600 font-mono text-base sm:text-lg">@{user.username}</div>
-                {user.email && <div className="text-gray-500 text-sm sm:text-base">{user.email}</div>}
-                {hasWebsite && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <a
-                          href={`${window.location.origin}/web/${user.username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors"
-                        >
-                          <Globe className="w-4 h-4" />
-                          <span className="text-sm font-medium">Мой сайт</span>
-                        </a>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Перейти на персональный сайт</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
+                <div className="text-primary font-mono text-base sm:text-lg">@{user.username}</div>
+                {user.email && <div className="text-muted-foreground text-sm sm:text-base">{user.email}</div>}
                 {currentUser?.user?.username === user.username && (
                   <>
                     <Button className="mt-4 text-sm sm:text-base">Редактировать профиль</Button>
                     
-                    {/* Секция управления сайтом */}
-                    <div className="w-full mt-4 sm:mt-6">
-                      <WebsiteManager />
-                    </div>
                     
-                    <form onSubmit={handleCreatePost} className="w-full flex flex-col gap-2 mt-4 sm:mt-6 p-3 sm:p-4 border rounded bg-gray-50">
+                    <form onSubmit={handleCreatePost} className="w-full flex flex-col gap-2 mt-4 sm:mt-6 p-3 sm:p-4 border border-border rounded bg-card">
                       <textarea
-                        className="border rounded p-2 sm:p-3 resize-none text-sm sm:text-base"
+                        className="border border-border rounded p-2 sm:p-3 resize-none text-sm sm:text-base bg-background text-foreground placeholder:text-muted-foreground"
                         rows={3}
                         placeholder="Что нового?"
                         value={postText}
                         onChange={e => setPostText(e.target.value)}
                         disabled={postLoading}
                       />
-                      <input type="file" accept="image/*" onChange={handleImageChange} disabled={postLoading} className="text-sm" />
+                      <input type="file" accept="image/*" onChange={handleImageChange} disabled={postLoading} className="text-sm text-foreground" />
                       {postImage && <img src={postImage} alt="preview" className="max-h-32 sm:max-h-40 object-contain rounded" />}
                       <Button type="submit" disabled={postLoading || !postText.trim()} className="self-end text-sm sm:text-base">Опубликовать</Button>
                     </form>
@@ -291,7 +255,7 @@ const UserProfile = () => {
                 <div className="mt-4 sm:mt-6 w-full">
                   <div className="font-semibold mb-2 text-sm sm:text-base">Подписчики: {followers.length}</div>
                   <div className="flex flex-wrap gap-2 sm:gap-3">
-                    {followers.length === 0 && <span className="text-gray-400 text-sm sm:text-base">Нет подписчиков</span>}
+                    {followers.length === 0 && <span className="text-muted-foreground text-sm sm:text-base">Нет подписчиков</span>}
                     {followers.map((f) => (
                       <Link key={f.username} to={`/u/users/${f.username}`} className="flex items-center gap-1.5 sm:gap-2 hover:underline">
                         <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
@@ -322,13 +286,13 @@ const UserProfile = () => {
           </div>
           <div className="mt-8 w-full max-w-2xl">
             <div className="font-semibold mb-2">Посты:</div>
-            {posts.length === 0 && <div className="text-gray-400">Нет постов</div>}
+            {posts.length === 0 && <div className="text-muted-foreground">Нет постов</div>}
             <div className="flex flex-col gap-4">
               {posts.map(post => {
                 const isOwner = currentUser?.user?._id && post.author === currentUser.user._id;
                 const isLiked = post.likes && userId ? post.likes.includes(userId) : false;
                 return (
-                  <div key={post._id} className="p-4 border rounded bg-white relative">
+                  <div key={post._id} className="p-4 border border-border rounded bg-card relative">
                     <div className="flex items-start gap-3 mb-2">
                       <div className="flex items-center gap-2">
                         <Avatar className="w-8 h-8">
@@ -354,8 +318,8 @@ const UserProfile = () => {
                       <div className="ml-auto">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="p-1 rounded-full hover:bg-gray-100">
-                              <EllipsisVertical className="w-5 h-5 text-gray-500" />
+                            <button className="p-1 rounded-full hover:bg-muted">
+                              <EllipsisVertical className="w-5 h-5 text-muted-foreground" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -375,7 +339,7 @@ const UserProfile = () => {
                     <div className="mb-2 whitespace-pre-line">{post.text}</div>
                     {post.image && <img src={post.image} alt="post" className="max-h-60 object-contain rounded" />}
                     <hr className="my-3" />
-                    <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <button
                         className={`text-pink-500 flex items-center gap-1 ${isLiked ? 'font-bold' : ''}`}
                         onClick={() => handleLikePost(post._id)}
@@ -392,11 +356,11 @@ const UserProfile = () => {
           </div>
         </main>
         {/* Правая колонка */}
-        <aside className="hidden lg:flex flex-col w-64 border-l bg-white p-4 sm:p-6 gap-4 sm:gap-6 min-h-svh sticky top-0">
+        <aside className="hidden lg:flex flex-col w-64 border-l border-border bg-card p-4 sm:p-6 gap-4 sm:gap-6 min-h-svh sticky top-0">
           <div>
             <div className="font-semibold text-base sm:text-lg mb-2">Мои подписки</div>
             {following.length === 0 ? (
-              <div className="text-gray-500 text-sm">Вы ни на кого не подписаны.</div>
+              <div className="text-muted-foreground text-sm">Вы ни на кого не подписаны.</div>
             ) : (
               <div className="flex flex-col gap-2 sm:gap-3">
                 {following.map(user => (
@@ -421,8 +385,8 @@ const UserProfile = () => {
                     </Link>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="p-1 rounded-full hover:bg-gray-100 ml-1">
-                          <EllipsisVertical className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                        <button className="p-1 rounded-full hover:bg-muted ml-1">
+                          <EllipsisVertical className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">

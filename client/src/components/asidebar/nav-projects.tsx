@@ -29,8 +29,7 @@ import useCreateProjectDialog from "@/hooks/use-create-project-dialog";
 import { ConfirmDialog } from "../resuable/confirm-dialog";
 import useConfirmDialog from "@/hooks/use-confirm-dialog";
 import { Button } from "../ui/button";
-import { Permissions } from "@/constant";
-import PermissionsGuard from "../resuable/permission-guard";
+// removed permission guards for universal access
 import { useState } from "react";
 import * as React from "react";
 import useGetProjectsInWorkspaceQuery from "@/hooks/api/use-get-projects";
@@ -67,6 +66,7 @@ export function NavProjects({ compact = false, onItemClick }: { compact?: boolea
 
   const isCoach = user?.userRole === "coach";
   const isAthlete = user?.userRole === "athlete";
+  // owner check not used after removing guards
 
   const { mutate, isPending: isLoading } = useMutation({
     mutationFn: deleteProjectMutationFn,
@@ -106,7 +106,7 @@ export function NavProjects({ compact = false, onItemClick }: { compact?: boolea
             variant: "success",
           });
 
-          navigate(`/workspace/${workspaceId}`);
+          navigate(`/workspace/${workspaceId}/home`);
           setTimeout(() => onCloseDialog(), 100);
         },
         onError: (error) => {
@@ -140,15 +140,13 @@ export function NavProjects({ compact = false, onItemClick }: { compact?: boolea
 
           {/* Кнопки для всех пользователей */}
           <div className="flex items-center gap-1">
-            <PermissionsGuard requiredPermission={Permissions.CREATE_PROJECT}>
-              <button
-                onClick={onOpen}
-                type="button"
-                className="flex size-5 items-center justify-center rounded-full border"
-              >
-                <Plus className="size-3.5" />
-              </button>
-            </PermissionsGuard>
+            <button
+              onClick={onOpen}
+              type="button"
+              className="flex size-5 items-center justify-center rounded-full border"
+            >
+              <Plus className="size-3.5" />
+            </button>
             <button
               onClick={handleOpenModal}
               type="button"
@@ -179,17 +177,15 @@ export function NavProjects({ compact = false, onItemClick }: { compact?: boolea
                 }
               </p>
               {/* Кнопка создания для всех пользователей */}
-              <PermissionsGuard requiredPermission={Permissions.CREATE_PROJECT}>
-                <Button
-                  variant="link"
-                  type="button"
-                  className="h-0 p-0 text-[13px] underline font-semibold mt-4"
-                  onClick={onOpen}
-                >
-                  {isCoach ? "Создать комнату" : isAthlete ? "Создать комнату" : "Создать комнату"}
-                  <ArrowRight />
-                </Button>
-              </PermissionsGuard>
+              <Button
+                variant="link"
+                type="button"
+                className="h-0 p-0 text-[13px] underline font-semibold mt-4"
+                onClick={onOpen}
+              >
+                {isCoach ? "Создать комнату" : isAthlete ? "Создать комнату" : "Создать комнату"}
+                <ArrowRight />
+              </Button>
             </div>
           ) : (
             projects.map((item) => {
@@ -226,39 +222,33 @@ export function NavProjects({ compact = false, onItemClick }: { compact?: boolea
                       <span>Открыть</span>
                     </DropdownMenuItem>
                     
-                    {/* Кнопка "Добавить участника" только для тренеров */}
-                    {isCoach && (
-                      <DropdownMenuItem asChild className="!cursor-pointer">
-                        <Link 
-                          to={`/workspace/${workspaceId}/members`} 
-                          className="flex items-center gap-2"
-                          onMouseEnter={() => setAddUserAnimating(true)}
-                          onMouseLeave={() => setAddUserAnimating(false)}
-                        >
-                          <AnimatedUsers isAnimating={addUserAnimating} />
-                          <span>Добавить участника</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-
-                    {/* Кнопка "Удалить" только для тренеров */}
-                    {isCoach && (
-                      <PermissionsGuard
-                        requiredPermission={Permissions.DELETE_PROJECT}
+                    {/* Кнопка "Добавить участника" доступна всем */}
+                    <DropdownMenuItem asChild className="!cursor-pointer">
+                      <Link 
+                        to={`/workspace/${workspaceId}/members`} 
+                        className="flex items-center gap-2"
+                        onMouseEnter={() => setAddUserAnimating(true)}
+                        onMouseLeave={() => setAddUserAnimating(false)}
                       >
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="!cursor-pointer"
-                          disabled={isLoading}
-                          onClick={() => onOpenDialog(item)}
-                          onMouseEnter={() => setDeleteAnimating(true)}
-                          onMouseLeave={() => setDeleteAnimating(false)}
-                        >
-                          <AnimatedDelete isAnimating={deleteAnimating} />
-                          <span>Удалить комнату</span>
-                        </DropdownMenuItem>
-                      </PermissionsGuard>
-                    )}
+                        <AnimatedUsers isAnimating={addUserAnimating} />
+                        <span>Добавить участника</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    {/* Кнопка "Удалить комнату" доступна всем (с подтверждением) */}
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="!cursor-pointer"
+                        disabled={isLoading}
+                        onClick={() => onOpenDialog(item)}
+                        onMouseEnter={() => setDeleteAnimating(true)}
+                        onMouseLeave={() => setDeleteAnimating(false)}
+                      >
+                        <AnimatedDelete isAnimating={deleteAnimating} />
+                        <span>Удалить комнату</span>
+                      </DropdownMenuItem>
+                    </>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </SidebarMenuItem>
@@ -302,12 +292,42 @@ export function NavProjects({ compact = false, onItemClick }: { compact?: boolea
                 const projectUrl = `/workspace/${workspaceId}/project/${item._id}`;
                 return (
                   <SidebarMenuItem key={item._id} className="!px-0">
-                    <SidebarMenuButton asChild isActive={projectUrl === pathname} className="!px-2">
-                      <Link to={projectUrl} onClick={onItemClick}>
-                        {item.emoji}
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                    <div className="flex items-center justify-between gap-1 pr-2 w-full">
+                      <SidebarMenuButton asChild isActive={projectUrl === pathname} className="!px-2">
+                        <Link to={projectUrl} onClick={onItemClick}>
+                          {item.emoji}
+                          <span>{item.name}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-md hover:bg-accent/60">
+                            <MoreHorizontal className="size-4" />
+                            <span className="sr-only">Еще</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 rounded-lg">
+                          <DropdownMenuItem className="!cursor-pointer" onClick={() => navigate(projectUrl)}>
+                            Открыть
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="!cursor-pointer">
+                            <Link to={`/workspace/${workspaceId}/members`}>
+                              Добавить участника
+                            </Link>
+                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="!cursor-pointer !text-destructive"
+                              disabled={isLoading}
+                              onClick={() => onOpenDialog(item)}
+                            >
+                              Удалить комнату
+                            </DropdownMenuItem>
+                          </>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </SidebarMenuItem>
                 );
               })

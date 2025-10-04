@@ -1,14 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import Logo from "@/components/logo";
+import SocialLogo from "@/components/logo/social-logo";
 import { Input } from "@/components/ui/input";
-import { Bell, Menu, ArrowLeft } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
+import ServicesMenu from "@/components/services-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import useAuth from "@/hooks/api/use-auth";
 import { useState, useEffect, useRef } from "react";
 import { searchUsersQueryFn } from "@/lib/api";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface SearchUser {
   _id: string;
@@ -30,7 +30,7 @@ export function SocialSidebarMenu() {
   const user = currentUser?.user;
   
   return (
-    <aside className="hidden lg:flex flex-col w-64 border-r bg-white p-4 sm:p-6 gap-3 sm:gap-4 min-h-svh sticky top-0">
+    <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card p-4 sm:p-6 gap-3 sm:gap-4 min-h-svh sticky top-0">
       <nav className="flex flex-col gap-1.5 sm:gap-2">
         {/* Мой профиль - динамическая ссылка */}
         {user && (
@@ -71,14 +71,14 @@ export function MobileMenu() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <button className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
-          <Menu className="w-5 h-5 text-gray-600" />
+        <button className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors">
+          <Menu className="w-5 h-5 text-muted-foreground" />
         </button>
       </SheetTrigger>
       <SheetContent side="left" className="w-80 p-0">
-        <SheetHeader className="p-4 border-b">
+        <SheetHeader className="p-4 border-b border-border">
           <SheetTitle className="text-left flex items-center gap-2">
-            <Logo />
+            <SocialLogo />
             <span className="font-medium">T-Sync.</span>
             <span className="px-2 py-0.5 rounded-full bg-foreground text-background text-xs font-semibold">beta</span>
           </SheetTitle>
@@ -197,29 +197,10 @@ const SocialHeader = () => {
       
       {/* Иконка поворота и логотип */}
       <div className="flex items-center gap-2 relative">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-1 rounded hover:bg-gray-100 transition-colors" aria-label="Платформа">
-              <ArrowLeft className="w-5 h-5 text-gray-500" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuItem asChild>
-              <a
-                href={user?.currentWorkspace?._id ? `/workspace/${user.currentWorkspace._id}` : '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full !cursor-pointer"
-              >
-                Перейти на платформу
-              </a>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ServicesMenu />
         <Link to="/u/" className="flex items-center gap-0 sm:gap-1">
-          <Logo />
-          <span className="hidden sm:flex ml-1 sm:ml-2 items-center gap-1 sm:gap-2 self-center font-medium text-sm sm:text-base">T-Sync.</span>
-          <span className="px-1 sm:px-2 py-0.5 rounded-full bg-foreground text-background text-xs font-semibold">beta</span>
+          <SocialLogo />
+          <span className="hidden sm:flex ml-1 sm:ml-2 items-center gap-1 sm:gap-2 self-center font-medium text-sm sm:text-base">Tsygram</span>
         </Link>
       </div>
       

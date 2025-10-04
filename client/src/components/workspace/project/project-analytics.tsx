@@ -15,6 +15,7 @@ const ProjectAnalytics = () => {
     queryFn: () => getProjectAnalyticsQueryFn({ workspaceId, projectId }),
     staleTime: 0,
     enabled: !!projectId,
+    refetchOnMount: true,
   });
 
   const analytics = data?.analytics;

@@ -177,7 +177,7 @@ export default function CreateProjectForm({
 
             <Button
               disabled={isPending}
-              className="flex w-full h-[40px] text-black font-semibold"
+              className="flex w-full h-[40px] text-white font-semibold"
               type="submit"
             >
               {isPending && <Loader className="animate-spin" />}

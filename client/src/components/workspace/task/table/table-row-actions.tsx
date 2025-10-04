@@ -34,7 +34,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
 
   const queryClient = useQueryClient();
   const workspaceId = useWorkspaceId();
-  const { hasPermission } = useAuthContext();
+  const { hasPermission, user, workspace } = useAuthContext();
 
   const { mutate, isPending } = useMutation({
     mutationFn: deleteTaskMutationFn,
@@ -50,7 +50,8 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const projectId = task.project?._id || "";
 
   const handleConfirm = () => {
-    if (!hasPermission(AppPermissions.DELETE_TASK)) {
+    const isOwner = user?._id && workspace?.owner && user._id === workspace.owner;
+    if (!hasPermission(AppPermissions.DELETE_TASK) && !isOwner) {
       toast({
         title: "Уведомление",
         description:
@@ -165,7 +166,8 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             <DropdownMenuItem
               className="!text-destructive cursor-pointer"
               onClick={() => {
-                if (!hasPermission(AppPermissions.DELETE_TASK)) {
+                const isOwner = user?._id && workspace?.owner && user._id === workspace.owner;
+                if (!hasPermission(AppPermissions.DELETE_TASK) && !isOwner) {
                   toast({
                     title: "Уведомление",
                     description:

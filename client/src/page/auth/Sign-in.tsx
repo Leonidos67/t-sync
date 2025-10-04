@@ -60,7 +60,8 @@ const SignIn = () => {
         const user = data.user;
         console.log(user);
         const decodedUrl = returnUrl ? decodeURIComponent(returnUrl) : null;
-        navigate(decodedUrl || `/workspace/${user.currentWorkspace}`);
+        // Если есть returnUrl, используем его, иначе перенаправляем на Welcome
+        navigate(decodedUrl || `/workspace/welcome`);
       },
       onError: (error) => {
         toast({
@@ -76,7 +77,7 @@ const SignIn = () => {
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
         <a
-          href="https://t-sync.ru"
+          href="https://t-sync-web.vercel.app"
           target="_blank"
           rel="noreferrer"
           className="flex items-center gap-2 self-center font-medium"

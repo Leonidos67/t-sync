@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
 
 const useConfirmDialog = () => {
-  const [open, setOpen] = useQueryState(
-    "confirm-dialog",
-    parseAsBoolean.withDefault(false)
-  );
+  const [open, setOpen] = useState(false);
   const [context, setContext] = useState<any>(null);
 
   const onOpenDialog = (data?: any) => {

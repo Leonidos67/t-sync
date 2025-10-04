@@ -13,7 +13,12 @@ const AuthRoute = () => {
 
   if (!user) return <Outlet />;
 
-  return <Navigate to={`workspace/${user.currentWorkspace?._id}`} replace />;
+  // Если у пользователя нет рабочего пространства, перенаправляем на Welcome
+  if (!user.currentWorkspace?._id) {
+    return <Navigate to="/workspace/welcome" replace />;
+  }
+
+  return <Navigate to={`workspace/${user.currentWorkspace._id}`} replace />;
 };
 
 export default AuthRoute;

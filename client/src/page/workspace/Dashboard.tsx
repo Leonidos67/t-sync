@@ -78,8 +78,8 @@ const WorkspaceDashboard = () => {
       <div className="mt-4">
         <IntegrationsManager />
       </div>
-              <div className="mt-4 mb-4">
-                  <Tabs value={selectedZone} onValueChange={handleZoneChange} className="w-full border rounded-lg p-2 bg-card main-content dashboard-tabs">
+      <div className="mt-4 mb-4">
+        <Tabs value={selectedZone} onValueChange={handleZoneChange} className="w-full border rounded-lg p-2 bg-card main-content dashboard-tabs">
           <div className="relative">
             <TabsList className="w-full justify-start border-0 bg-muted px-1 h-12 overflow-x-auto whitespace-nowrap scrollbar-hide dashboard-tabs-list">
               <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="projects">
@@ -87,6 +87,9 @@ const WorkspaceDashboard = () => {
               </TabsTrigger>
               <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="tasks">
                 Актуальные тренировки
+              </TabsTrigger>
+              <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="overdue">
+                Просроченные тренировки
               </TabsTrigger>
               <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="completed">
                 Выполненные тренировки
@@ -101,7 +104,10 @@ const WorkspaceDashboard = () => {
             <RecentProjects />
           </TabsContent>
           <TabsContent value="tasks" className="mt-0">
-            <RecentTasks />
+            <RecentTasks mode="active" />
+          </TabsContent>
+          <TabsContent value="overdue" className="mt-0">
+            <RecentTasks mode="overdue" />
           </TabsContent>
           <TabsContent value="completed" className="mt-0">
             <SimpleCompletedTasks />
@@ -149,6 +155,9 @@ const WorkspaceDashboard = () => {
               <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="tasks">
                 Актуальные тренировки
               </TabsTrigger>
+              <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="overdue">
+                Просроченные
+              </TabsTrigger>
               <TabsTrigger className="py-2 hover:bg-accent hover:text-accent-foreground transition-colors duration-200" value="completed">
                 Выполненные тренировки
               </TabsTrigger>
@@ -162,7 +171,10 @@ const WorkspaceDashboard = () => {
             <RecentProjects />
           </TabsContent>
           <TabsContent value="tasks" className="mt-0">
-            <RecentTasks />
+            <RecentTasks mode="active" />
+          </TabsContent>
+          <TabsContent value="overdue" className="mt-0">
+            <RecentTasks mode="overdue" />
           </TabsContent>
           <TabsContent value="completed" className="mt-0">
             <SimpleCompletedTasks />
@@ -174,6 +186,8 @@ const WorkspaceDashboard = () => {
       </div>
     </div>
   );
+
+  
 
   return (
     <>

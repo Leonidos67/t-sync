@@ -50,9 +50,11 @@ export default function AiAssistant() {
 
   
 
-  // Загружаем сообщения из localStorage при инициализации
+  // Загружаем сообщения из localStorage для текущего рабочего пространства
   useEffect(() => {
-    const savedMessages = localStorage.getItem('ai-chat-messages');
+    if (!workspaceId) return;
+    const storageKey = `ai-chat-messages:${workspaceId}`;
+    const savedMessages = localStorage.getItem(storageKey);
     if (savedMessages) {
       try {
         const parsedMessages = JSON.parse(savedMessages);
@@ -60,15 +62,21 @@ export default function AiAssistant() {
       } catch (e) {
         console.error('Failed to parse saved messages:', e);
       }
+    } else {
+      setMessages([]);
     }
-  }, []);
+  }, [workspaceId]);
 
-  // Сохраняем сообщения в localStorage при изменении
+  // Сохраняем сообщения в localStorage при изменении (на уровне рабочего пространства)
   useEffect(() => {
+    if (!workspaceId) return;
+    const storageKey = `ai-chat-messages:${workspaceId}`;
     if (messages.length > 0) {
-      localStorage.setItem('ai-chat-messages', JSON.stringify(messages));
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+    } else {
+      localStorage.removeItem(storageKey);
     }
-  }, [messages]);
+  }, [messages, workspaceId]);
 
   // Префилл вопроса из router state (например, из выделенного текста)
   useEffect(() => {
@@ -341,7 +349,9 @@ export default function AiAssistant() {
 
   const clearChat = () => {
     setMessages([]);
-    localStorage.removeItem('ai-chat-messages');
+    if (workspaceId) {
+      localStorage.removeItem(`ai-chat-messages:${workspaceId}`);
+    }
   };
 
   const addAthlete = (athlete: { _id: string; name: string; email: string }) => {

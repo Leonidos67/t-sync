@@ -3,6 +3,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { HTTPSTATUS } from "../config/http.config";
 import { getCurrentUserService } from "../services/user.service";
 import UserModel, { FollowerModel, PostModel } from "../models/user.model";
+import { compareValue } from "../utils/bcrypt";
 
 export const getCurrentUserController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -134,6 +135,129 @@ export const unfollowUserController = asyncHandler(async (req: Request, res: Res
   await FollowerModel.deleteOne({ follower: userId, following: userToUnfollow._id });
   return res.status(200).json({ message: "Вы отписались" });
 });
+
+export const updatePersonalDataController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { phoneNumber, email, firstName, lastName, gender, birthDate, city } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Пользователь не авторизован" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Пользователь не найден" });
+    }
+
+    // Обновляем поля
+    if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+    if (email !== undefined) user.email = email;
+    if (firstName !== undefined) user.firstName = firstName;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (gender !== undefined) user.gender = gender;
+    if (birthDate !== undefined) user.birthDate = birthDate;
+    if (city !== undefined) user.city = city;
+
+    // Обновляем полное имя
+    if (firstName !== undefined || lastName !== undefined) {
+      const fullName = `${firstName || user.firstName || ''} ${lastName || user.lastName || ''}`.trim();
+      user.name = fullName;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Личные данные успешно обновлены",
+      user: {
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        birthDate: user.birthDate,
+        city: user.city
+      }
+    });
+  }
+);
+
+export const updateNotificationSettingsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { email, push, tasks, newTasks, taskUpdates, projectUpdates } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Пользователь не авторизован" });
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Пользователь не найден" });
+    }
+
+    // Инициализируем настройки уведомлений если их нет
+    if (!user.notificationSettings) {
+      user.notificationSettings = {
+        email: true,
+        push: true,
+        tasks: true,
+        newTasks: true,
+        taskUpdates: true,
+        projectUpdates: true
+      };
+    }
+
+    // Обновляем настройки уведомлений
+    if (email !== undefined) user.notificationSettings.email = email;
+    if (push !== undefined) user.notificationSettings.push = push;
+    if (tasks !== undefined) user.notificationSettings.tasks = tasks;
+    if (newTasks !== undefined) user.notificationSettings.newTasks = newTasks;
+    if (taskUpdates !== undefined) user.notificationSettings.taskUpdates = taskUpdates;
+    if (projectUpdates !== undefined) user.notificationSettings.projectUpdates = projectUpdates;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Настройки уведомлений успешно обновлены",
+      notificationSettings: user.notificationSettings
+    });
+  }
+);
+
+export const changePasswordController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { currentPassword, newPassword } = req.body as {
+      currentPassword?: string;
+      newPassword?: string;
+    };
+
+    if (!userId) {
+      return res.status(401).json({ message: "Пользователь не авторизован" });
+    }
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Текущий и новый пароли обязательны" });
+    }
+
+    const user = await UserModel.findById(userId).select("+password");
+    if (!user || !user.password) {
+      return res.status(404).json({ message: "Пользователь не найден" });
+    }
+
+    const isMatch = await compareValue(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Неверный текущий пароль" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Пароль успешно изменён" });
+  }
+);
 
 export const getAllUsersController = asyncHandler(async (req: Request, res: Response) => {
   const users = await UserModel.find({}, "name username profilePicture");

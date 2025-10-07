@@ -15,12 +15,11 @@ const Creatium: React.FC = () => {
         <div className="flex h-full">
           {/* Sidebar */}
           <aside className="w-64 shrink-0 bg-card/50 p-3 flex flex-col">
-            <div className="text-base font-semibold mb-3">T‑Sync Creatium</div>
+            <div className="text-base font-semibold mb-3">Pragma Atlass</div>
             <nav className="flex flex-col gap-1">
               <Link to="/creatium" className="px-2 py-1 rounded bg-accent text-accent-foreground">Главная</Link>
               <Link to="/creatium/create" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Мои сайты</Link>
-              <Link to="/id" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">T-Sync ID</Link>
-              <Link to="#" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Просмотр</Link>
+              <Link to="#" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Аналитика</Link>
             </nav>
             {/* Guide section at bottom */}
             <div className="mt-auto bg-[#111] rounded-2xl p-2 mb-[5px]">
@@ -29,7 +28,7 @@ const Creatium: React.FC = () => {
                 className="w-full justify-between text-left rounded-2xl"
                 onClick={() => setIsGuideOpen(!isGuideOpen)}
               >
-                <span>Руководство</span>
+                <span>Ваш прогресс</span>
                 <ChevronUp className={`h-4 w-4 transition-transform ${isGuideOpen ? 'rotate-180' : ''}`} />
               </Button>
               {/* Expandable items with animation */}
@@ -56,7 +55,7 @@ const Creatium: React.FC = () => {
           </aside>
 
           {/* Content area */}
-          <main className="flex-1 pr-[15px] pt-[15px] pb-[15px] bg-[#000] overflow-visible">
+          <main className="flex-1 pr-[15px] pt-[15px] pb-[15px] bg-card/50 overflow-visible">
             {/* Parent block with border and 15px padding, full viewport height */}
             <div className="border rounded-2xl bg-[#111] shadow-sm p-[15px] h-[calc(100vh-30px)] overflow-visible">
               
@@ -65,7 +64,7 @@ const Creatium: React.FC = () => {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-4">Создайте свой персональный сайт</h2>
                   <p className="text-muted-foreground mb-4">
-                    T-Creatium позволяет легко создать профессиональный персональный сайт. 
+                    Pragma Atlass позволяет легко создать профессиональный персональный сайт. 
                     Покажите свои достижения, навыки и работы в красивом и современном формате.
                   </p>
                   <div className="space-y-2 text-sm text-muted-foreground">

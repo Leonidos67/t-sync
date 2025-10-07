@@ -226,7 +226,7 @@ const GeneralSettings = () => {
                   <div className="space-y-0.5">
                     <Label className="text-base font-medium !cursor-pointer">Внешний вид</Label>
                     <p className="text-sm text-muted-foreground">
-                      Настройте дизайн T-Sync на вашем устройстве
+                      Настройте дизайн Atlass на вашем устройстве
                     </p>
                   </div>
                 </div>
@@ -315,7 +315,7 @@ const GeneralSettings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">Название</label>
-                  <p className="text-sm text-muted-foreground">T-Sync Workspace</p>
+                  <p className="text-sm text-muted-foreground">Atlass Workspace</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium">Описание</label>

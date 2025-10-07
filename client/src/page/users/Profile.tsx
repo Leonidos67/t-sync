@@ -197,7 +197,7 @@ const UserProfile = () => {
           <div className="w-full flex flex-col gap-4 sm:gap-6 max-w-2xl">
             <Card className="p-0">
               <div className="flex flex-col items-center gap-2 pt-6 sm:pt-8">
-                <div className="text-base sm:text-lg font-semibold mb-2 text-center">👋 Привет! Я пользуюсь T-Sync.</div>
+                <div className="text-base sm:text-lg font-semibold mb-2 text-center">👋 Привет! Я пользуюсь Atlass.</div>
               </div>
               <div className="flex flex-col items-center gap-3 sm:gap-4 px-4 sm:px-8 pb-6 sm:pb-8">
                 <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mt-2">

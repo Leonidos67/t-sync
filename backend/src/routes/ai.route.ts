@@ -177,7 +177,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
 
          const lowerPrompt = (prompt || "").toLowerCase();
      const asksWho = lowerPrompt.includes("кто ты") || lowerPrompt.includes("кто тебя разработал") || lowerPrompt.includes("кем ты был разработан") || lowerPrompt.includes("кто разработал") || lowerPrompt.includes("who are you") || lowerPrompt.includes("who developed") || lowerPrompt.includes("who built you");
-     const introduceLine = asksWho ? "Меня разработала команда T-Sync." : "";
+     const introduceLine = asksWho ? "Меня разработала команда Atlass." : "";
 
      // Проверяем, не указал ли пользователь конкретную зону в запросе
      const workspaceMatch = (prompt || '').match(/зона[:\s]+([^\s]+)/i) || (prompt || '').match(/workspace[:\s]+([^\s]+)/i);
@@ -228,7 +228,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
     }
 
     const systemInstruction = `Ты — ассистент навигации по приложению тренера/спортсмена женского пола. Отвечай кратко и по делу на русском.
-Если пользователь спрашивает кто ты/кто разработал — обязательно ответь: \'Я — ассистент T-Sync.\'.
+Если пользователь спрашивает кто ты/кто разработал — обязательно ответь: \'Я — ассистент Atlass.\'.
 Можешь подсказывать маршруты (например /workspace/:id/tasks), но не добавляй query-параметры (например ?project=).
 Если спрашивают про конкретную комнату (проект) или тренировку, добавь прямую ссылку на комнату: /workspace/:workspaceId/project/:projectId.
 Избегай навязчивых рекомендаций вроде \'Рекомендую проверить просроченные тренировки\'. Если нет данных, скажи, что данных нет.`;
@@ -630,7 +630,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
             fallbackAnswer = `Выполненные тренировки: ${completedCount}\n\nСсылка: /workspace/${workspaceId}/completed`;
           }
         } else if (lower.includes("привет") || lower.includes("hello")) {
-         fallbackAnswer = `Привет! Я помогу вам с навигацией по T-Sync. У вас ${projects?.length || 0} комнат.`;
+         fallbackAnswer = `Привет! Я помогу вам с навигацией по сервисам Atlass. Задайте мне любой вопрос!`;
        } else {
          // Общий ответ с кратким контекстом
          fallbackAnswer = `В вашей зоне ${projects?.length || 0} комнат и ${members?.length || 0} участников.`;
@@ -792,7 +792,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
               errorFallbackAnswer = `Выполненные тренировки: ${completedCount}\n\nСсылка: /workspace/${workspaceId}/completed`;
             }
           } else if (lower.includes("привет") || lower.includes("hello")) {
-            errorFallbackAnswer = `Привет! Я помогу вам с навигацией по T-Sync. У вас ${projects?.length || 0} комнат.`;
+            errorFallbackAnswer = `Привет! Я помогу вам с навигацией по всем сервисам Atlass. Задайте мне любой вопрос!`;
           } else {
             // Общий ответ с кратким контекстом
             errorFallbackAnswer = `В вашей зоне ${projects?.length || 0} комнат и ${members?.length || 0} участников.`;

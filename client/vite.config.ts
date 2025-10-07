@@ -11,6 +11,10 @@ export default defineConfig({
     },
   },
   server: {
+    fs: {
+      // allow importing TS/TSX from sibling web/ folder
+      allow: [path.resolve(__dirname, ".."), path.resolve(__dirname, "../web")],
+    },
     proxy: {
       "/api": {
         target: process.env.VITE_PROXY_TARGET || "http://localhost:8000",

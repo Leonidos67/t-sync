@@ -160,7 +160,7 @@ export default function NewUserOnboardingDialog({ open, onClose, onFinish }: New
             {step === 1 && (
               <>
                 <DialogHeader>
-                  <DialogTitle>Как вы планируете использовать T-Sync?</DialogTitle>
+                  <DialogTitle>Как вы планируете использовать Atlass Rise?</DialogTitle>
                   <DialogDescription>
                     Эти ответы помогут вам персонализировать свою работу
                   </DialogDescription>

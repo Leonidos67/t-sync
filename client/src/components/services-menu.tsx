@@ -65,8 +65,8 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">T-Sync ID</span>
-                    <span className="text-xs text-muted-foreground truncate">Единый профиль и настройки аккаунта</span>
+                    <span className="text-sm font-medium text-foreground truncate">Atlass ID</span>
+                    <span className="text-xs text-muted-foreground truncate">Единый профиль экосистемы Atlass и настройки аккаунта</span>
                   </div>
                   <div className="flex-shrink-0">
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -86,7 +86,7 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">T-Sync Platform</span>
+                    <span className="text-sm font-medium text-foreground truncate">Atlass Rise</span>
                     <span className="text-xs text-muted-foreground truncate">Управление проектами, задачами и командой</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -110,7 +110,7 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Tsygram</span>
+                    <span className="text-sm font-medium text-foreground truncate">Atlass Volt</span>
                     <span className="text-xs text-muted-foreground truncate">Социальная сеть для спортсменов и тренеров</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -129,7 +129,7 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">T-Creatium</span>
+                    <span className="text-sm font-medium text-foreground truncate">Pragma Atlass</span>
                     <span className="text-xs text-muted-foreground truncate">Создание персональных сайтов и портфолио</span>
                   </div>
                   <div className="flex-shrink-0">

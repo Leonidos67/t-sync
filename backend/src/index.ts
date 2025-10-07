@@ -3,6 +3,8 @@ dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import session from "cookie-session";
+import path from "path";
+import fs from "fs";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -23,6 +25,7 @@ import taskRoutes from "./routes/task.route";
 import publicUserRoutes from "./routes/public-user.route";
 import websiteRoutes from "./routes/website.route";
 import aiRoutes from "./routes/ai.route";
+import downloadRoutes from "./routes/download.route";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -36,7 +39,12 @@ app.use(
     name: "session",
     keys: [config.SESSION_SECRET],
     maxAge: 24 * 60 * 60 * 1000,
-    secure: config.NODE_ENV === "production",
+    // Use non-secure cookies on localhost (even if NODE_ENV=production) or when running Electron desktop
+    secure:
+      config.NODE_ENV === "production" &&
+      process.env.DESKTOP_APP !== "true" &&
+      // allow non-secure when FRONTEND_ORIGIN is localhost over http
+      !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN),
     httpOnly: true,
     sameSite: "lax",
   })
@@ -47,26 +55,35 @@ app.use(passport.session());
 
 app.use(
   cors({
-    origin:
-      config.NODE_ENV === "production"
-        ? config.FRONTEND_ORIGIN
-        : (origin, callback) => callback(null, true),
+    origin: (origin, callback) => {
+      // Allow requests with no origin like mobile apps or curl
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        config.FRONTEND_ORIGIN,
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+      ];
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // In development, allow any localhost origin
+      if (
+        config.NODE_ENV !== "production" &&
+        /^http:\/\/localhost:\d+$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     credentials: true,
   })
 );
 
-app.get(
-  `/`,
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    throw new BadRequestException(
-      "This is a bad request",
-      ErrorCodeEnum.AUTH_INVALID_TOKEN
-    );
-    return res.status(HTTPSTATUS.OK).json({
-      message: "Hello Subscribe to the channel & share",
-    });
-  })
-);
+// Root route is handled by SPA static handler in production; avoid throwing here
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/user/public`, publicUserRoutes);
@@ -77,6 +94,32 @@ app.use(`${BASE_PATH}/member`, isAuthenticated, memberRoutes);
 app.use(`${BASE_PATH}/project`, isAuthenticated, projectRoutes);
 app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 app.use(`${BASE_PATH}/v1/ai`, aiRoutes);
+app.use(`${BASE_PATH}/downloads`, downloadRoutes);
+
+// Serve static SPA if client build is present (handles packaged Electron paths)
+if (config.NODE_ENV === "production") {
+  const candidatePaths = [
+    // When running from backend/dist inside packaged app: go up to app root then client/dist
+    path.join(__dirname, "../../client/dist"),
+    // When running locally beside backend/dist
+    path.join(__dirname, "../client/dist"),
+  ];
+
+  const clientDist = candidatePaths.find((p) => fs.existsSync(path.join(p, "index.html")));
+
+  if (clientDist) {
+    app.use(express.static(clientDist));
+
+    // Catch all handler for SPA - serve index.html for all non-API routes
+    app.get("*", (req, res) => {
+      if (!req.path.startsWith("/api")) {
+        res.sendFile(path.join(clientDist as string, "index.html"));
+      } else {
+        res.status(404).json({ message: "API endpoint not found" });
+      }
+    });
+  }
+}
 
 app.use(errorHandler);
 

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,8 @@ import {
   ExternalLink,
   Edit3,
   Link2,
-  Lock
+  Lock,
+  // Download
 } from "lucide-react";
 import { Grip } from "@/components/ui/motion/Grip";
 import useAuth from "@/hooks/api/use-auth";
@@ -31,17 +32,19 @@ import { useTheme } from "@/hooks/use-theme";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { updatePersonalDataMutationFn, logoutMutationFn, updateNotificationSettingsMutationFn, changePasswordMutationFn } from "@/lib/api";
+import IdLogo from "@/components/logo/id-logo";
 import { ConfirmDialog } from "@/components/resuable/confirm-dialog";
 import useConfirmDialog from "@/hooks/use-confirm-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import LogoutDialog from "@/components/asidebar/logout-dialog";
+// import LogoutDialog from "@/components/asidebar/logout-dialog";
 
 const IdPage = () => {
   const { data: authData, isLoading } = useAuth();
   const navigate = useNavigate();
   const user = authData?.user;
   const { theme, setTheme } = useTheme();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const [isServicesModalOpen, setIsServicesModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
@@ -102,6 +105,17 @@ const IdPage = () => {
   });
 
   const [showBirthdayPrompt, setShowBirthdayPrompt] = useState(true);
+  // Обработка deep-link параметров (?tab=&settingsTab=)
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    const settingsParam = searchParams.get('settingsTab');
+    if (tabParam === 'settings') {
+      setActiveTab('settings');
+    }
+    if (settingsParam) {
+      setSettingsTab(settingsParam);
+    }
+  }, [searchParams]);
   // Эффект для проверки даты рождения
   useEffect(() => {
     if (user) {
@@ -145,7 +159,6 @@ const IdPage = () => {
   const slidingBgRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const { open: isLogoutConfirmOpen, onOpenDialog: openLogoutConfirm, onCloseDialog: closeLogoutConfirm } = useConfirmDialog();
-  const [isHeaderLogoutOpen, setIsHeaderLogoutOpen] = useState(false);
 
   // Мутация для выхода из системы
   const logoutMutation = useMutation({
@@ -325,8 +338,8 @@ const IdPage = () => {
       setShowChangePassword(false);
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     },
-    onError: (error: any) => {
-      const description = error?.response?.data?.message || "Не удалось изменить пароль";
+    onError: (error: unknown) => {
+      const description = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Не удалось изменить пароль";
       toast({
         title: "Ошибка",
         description,
@@ -409,7 +422,7 @@ const IdPage = () => {
       toast({ title: "Нет изменений", description: "Измените хотя бы одно поле", variant: "default" });
       return;
     }
-    updatePersonalDataMutation.mutate(payload as any);
+    updatePersonalDataMutation.mutate(payload);
   };
 
   const handleEditProfile = () => {
@@ -547,41 +560,44 @@ const IdPage = () => {
     switch (activeTab) {
       case 'profile':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Settings className="w-5 h-5" />
-                <span>Основная информация</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Имя:</span>
-                  <span className="font-medium text-foreground">{user.name}</span>
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Settings className="w-5 h-5" />
+                  <span>Основная информация</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Имя:</span>
+                    <span className="font-medium text-foreground">{user.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Username:</span>
+                    <span className="font-medium text-foreground">@{user.username}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span className="font-medium text-foreground">{user.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Роль:</span>
+                    <span className="font-medium text-foreground">
+                      {user.userRole === "coach" ? "Тренер" : 
+                       user.userRole === "athlete" ? "Спортсмен" : "Пользователь"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">На Atlass с:</span>
+                    <span className="font-medium text-foreground">{format(new Date(user.createdAt), 'MMMM yyyy', { locale: ru })}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Username:</span>
-                  <span className="font-medium text-foreground">@{user.username}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Email:</span>
-                  <span className="font-medium text-foreground">{user.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Роль:</span>
-                  <span className="font-medium text-foreground">
-                    {user.userRole === "coach" ? "Тренер" : 
-                     user.userRole === "athlete" ? "Спортсмен" : "Пользователь"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">На T-Sync с:</span>
-                  <span className="font-medium text-foreground">{format(new Date(user.createdAt), 'MMMM yyyy', { locale: ru })}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+          </div>
         );
       case 'activity':
         return (
@@ -723,7 +739,7 @@ const IdPage = () => {
                       <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted cursor-not-allowed opacity-50">
                         <div>
                           <span className="text-foreground font-medium">Единый профиль</span>
-                          <p className="text-muted-foreground text-sm mt-1">Ваш профиль синхронизирован между всеми сервисами T-Sync</p>
+                          <p className="text-muted-foreground text-sm mt-1">Ваш профиль синхронизирован между всеми сервисами Atlass</p>
                         </div>
                         <Switch
                           checked={true}
@@ -1291,7 +1307,7 @@ const IdPage = () => {
               <span className="font-medium text-sm text-foreground">Наши сервисы</span>
             </div>
             <div className="space-y-1">
-              {/* T-Sync ID */}
+              {/* Atlass ID */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1328,7 +1344,7 @@ const IdPage = () => {
                   </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">T-Sync ID</span>
+                    <span className="text-sm font-medium text-foreground truncate">Atlass ID</span>
                     <span className="text-xs text-muted-foreground truncate">Единый профиль и настройки аккаунта</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1337,7 +1353,7 @@ const IdPage = () => {
                 </Link>
               </Button>
   
-              {/* T-Sync Platform */}
+              {/* Atlass Rise */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1360,7 +1376,7 @@ const IdPage = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">T-Sync Platform</span>
+                    <span className="text-sm font-medium text-foreground truncate">Atlass Rise</span>
                     <span className="text-xs text-muted-foreground truncate">Управление проектами, задачами и командой</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1369,7 +1385,7 @@ const IdPage = () => {
                 </Link>
               </Button>
   
-              {/* Tsygram */}
+              {/* Atlass Volt */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1394,7 +1410,7 @@ const IdPage = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Tsygram</span>
+                    <span className="text-sm font-medium text-foreground truncate">Atlass Volt</span>
                     <span className="text-xs text-muted-foreground truncate">Социальная сеть для спортсменов и тренеров</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1403,7 +1419,7 @@ const IdPage = () => {
                 </Link>
               </Button>
   
-              {/* T-Creatium */}
+              {/* Pragma Atlass */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1425,7 +1441,7 @@ const IdPage = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">T-Creatium</span>
+                    <span className="text-sm font-medium text-foreground truncate">Pragma Atlass</span>
                     <span className="text-xs text-muted-foreground truncate">Создание персональных сайтов и портфолио</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1446,8 +1462,9 @@ const IdPage = () => {
       <header className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <a href="/id/" className="text-xl font-semibold text-foreground">T-Sync ID</a>
+            <div className="flex items-center space-x-3">
+              <IdLogo url="/id" />
+              <a href="/id/" className="text-xl font-semibold text-foreground">Atlass ID</a>
               <ServicesModal />
             </div>
             <div className="flex items-center space-x-3">
@@ -1462,10 +1479,6 @@ const IdPage = () => {
                 ) : (
                   <Sun className="w-4 h-4" />
                 )}
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsHeaderLogoutOpen(true)}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Выйти из аккаунта
               </Button>
             </div>
           </div>
@@ -1596,7 +1609,7 @@ const IdPage = () => {
       cancelText="Отменить"
     />
 
-    <LogoutDialog isOpen={isHeaderLogoutOpen} setIsOpen={setIsHeaderLogoutOpen} />
+    {/* Header logout dialog removed */}
 
     </div>
   );

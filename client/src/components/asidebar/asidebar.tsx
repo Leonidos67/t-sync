@@ -44,7 +44,7 @@ const Asidebar = () => {
   return (
     <>
       <div className="flex h-full min-h-screen">
-        <Sidebar collapsible="icon" className="flex-grow h-auto">
+        <Sidebar collapsible="icon" className="flex-grow h-[calc(100vh-240px)] overflow-y-auto overflow-x-hidden">
           <SidebarHeader className="!py-0 bg-sidebar-background">
             <div className="flex h-[50px] items-center justify-start w-full px-1">
               <Logo url={`/workspace/${workspaceId}/home`} />
@@ -53,13 +53,13 @@ const Asidebar = () => {
                   to={`/workspace/${workspaceId}/home`}
                   className=" md:flex ml-2 items-center gap-2 self-center font-medium text-sidebar-foreground"
                 >
-                  T-Sync
-                  <span className="px-2 py-0.5 rounded-full bg-sidebar-primary text-sidebar-primary-foreground text-xs font-semibold">beta</span>
+                  Atlass Rise
                 </Link>
               )}
             </div>
           </SidebarHeader>
-          <SidebarContent className=" !mt-0 bg-sidebar-background">
+          <SidebarContent className=" !mt-0 bg-sidebar-background overflow-y-auto">
+            {/* max-h-[calc(100vh-50px-72px)] для ограничения высоты контента SidebarContent */}
             <SidebarGroup className="!py-0">
               <SidebarGroupContent>
                 <WorkspaceSwitcher />

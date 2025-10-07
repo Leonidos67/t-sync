@@ -21,6 +21,7 @@ import UsersListPage from "@/page/users/UsersList";
 import UserProfile from "@/page/users/Profile";
 import SocialMainPage from "@/page/users/index";
 import PublicWebsitePage from "@/page/website/PublicWebsite";
+import LandingProxy from "@/page/landing/LandingProxy";
 import AiAssistant from "@/page/ai/Assistant";
 import AuthGuard from "@/components/auth-guard";
 import IdPage from "@/page/id";
@@ -57,6 +58,7 @@ export const baseRoutePaths = [
   { path: "/u/users", element: <AuthGuard><UsersListPage /></AuthGuard> },
   { path: "/u/users/:username", element: <AuthGuard><UserProfile /></AuthGuard> },
   { path: "/web/:username", element: <PublicWebsitePage /> },
+  { path: "/", element: <LandingProxy /> },
 ];
 
 function WorkspaceHomeRedirect() {

@@ -1,0 +1,31 @@
+{
+  "name": "atlass-rise-desktop",
+  "version": "1.0.0",
+  "description": "Atlass Rise Desktop Application - Platform for managing training sessions",
+  "main": "electron/main.js",
+  "scripts": {
+    "setup": "node build-scripts/setup-env.js",
+    "build": "node build-scripts/build-all.js",
+    "build-desktop": "npm run setup && npm run build && cd electron && npm run build-win",
+    "copy-installer": "node build-scripts/copy-installer.js",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd client && npm run dev\"",
+    "start": "cd electron && npm start",
+    "install-deps": "npm install && cd backend && npm install && cd ../client && npm install && cd ../electron && npm install",
+    "clean": "rimraf dist electron/dist backend/dist client/dist",
+    "package": "npm run build-desktop && npm run copy-installer"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "keywords": [
+    "desktop",
+    "electron",
+    "training",
+    "fitness",
+    "workout",
+    "sports"
+  ],
+  "author": "Atlass Rise Team",
+  "license": "MIT"
+}

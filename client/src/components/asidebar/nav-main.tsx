@@ -67,12 +67,6 @@ export function NavMain({ compact = false, onItemClick }: NavMainProps) {
       isAnimated: true,
     },
     {
-      title: "T-Sync ID",
-      url: "/u/",
-      icon: User,
-      isAnimated: false,
-    },
-    {
       title: "Мои данные",
       url: `/workspace/${workspaceId}/profile`,
       icon: AnimatedUser,

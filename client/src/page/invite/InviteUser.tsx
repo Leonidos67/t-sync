@@ -62,7 +62,7 @@ const InviteUser = () => {
           className="flex items-center gap-2 self-center font-medium"
         >
           <Logo />
-          T-Sync.
+          Atlass Rise.
         </Link>
         <div className="flex flex-col gap-6">
           <Card>
@@ -71,7 +71,7 @@ const InviteUser = () => {
                 Приглашение в тренировочную зону
               </CardTitle>
               <CardDescription>
-                Вас пригласили присоединиться к тренировочной зоне. Войдите в свою учетную запись T-Sync, чтобы начать тренировки.
+                Вас пригласили присоединиться к тренировочной зоне. Войдите в свою учетную запись Atlass, чтобы начать тренировки.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -1,0 +1,79 @@
+{
+  "name": "t-sync-desktop",
+  "version": "1.0.0",
+  "description": "T-Sync Desktop Application",
+  "author": "T-Sync Team",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "dist": "npm run build-frontend && npm run build-backend && electron-builder",
+    "build-frontend": "cd ../client && npm run build:fast",
+    "build-backend": "cd ../backend && npm run build",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.tsync.desktop",
+    "productName": "T-Sync Platform",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "../client/dist/**/*",
+      "../backend/dist/**/*",
+      "../backend/node_modules/**/*",
+      "!../backend/node_modules/**/test/**",
+      "!../backend/node_modules/**/tests/**",
+      "!../backend/node_modules/**/*.d.ts"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/package.json",
+        "to": "backend/package.json"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "T-Sync Platform"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "mongoose": "^8.9.2",
+    "bcrypt": "^5.1.1",
+    "cookie-session": "^2.1.0",
+    "passport": "^0.5.3",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "uuid": "^11.0.3",
+    "zod": "^3.24.1",
+    "axios": "^1.11.0",
+    "node-fetch": "^3.3.2",
+    "@sendgrid/mail": "^8.1.5",
+    "yookassa": "^0.1.1"
+  }
+}
+

@@ -253,11 +253,6 @@ em-emoji-picker {
     @apply text-foreground;
   }
 
-  /* Стили для beta блока */
-  .beta-badge {
-    @apply bg-foreground text-background;
-  }
-
   /* Стили для кнопок AI */
   .ai-button {
     @apply bg-primary text-primary-foreground hover:bg-primary/90;
@@ -558,6 +553,31 @@ em-emoji-picker {
 
   .dark .scrollbar:hover {
     scrollbar-color: hsl(var(--muted-foreground) / 0.7) hsl(var(--muted));
+  }
+
+  /* Global scrollbar styles for ALL elements in dark theme */
+  .dark * {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.5) hsl(var(--muted)); /* Firefox */
+    scrollbar-width: thin; /* Firefox */
+  }
+
+  .dark *::-webkit-scrollbar {
+    width: 10px; /* Chrome, Safari, Edge */
+    height: 10px;
+  }
+
+  .dark *::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  .dark *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.5);
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--muted));
+  }
+
+  .dark *:hover::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.7);
   }
 
   /* Дополнительные стили для анимаций и переходов в темной теме */

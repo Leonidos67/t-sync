@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import TipTapEditor from "@/components/tiptap-editor";
 import { useToast } from "@/hooks/use-toast";
 import useAuth from "@/hooks/api/use-auth";
-import { ChevronUp, X, Globe, Mountain, Compass, Plus } from "lucide-react";
+import { X, Globe, Mountain, Compass, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
 import BottomSheet from "@/components/ui/bottom-sheet";
@@ -24,8 +24,7 @@ const CreatiumCreate: React.FC = () => {
   const [description, setDescription] = useState("");
   const [about, setAbout] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
-  const [completedSteps] = useState(0);
+  // Guide section removed on Create page
   const [selectedCoverIndex, setSelectedCoverIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<'gradient' | 'geometric' | 'effects'>('gradient');
   const [priceType, setPriceType] = useState<'free' | 'one_time' | 'recurring'>('free');
@@ -439,49 +438,19 @@ const CreatiumCreate: React.FC = () => {
         <div className="flex min-h-screen">
           {/* Sidebar */}
           <aside className="w-64 shrink-0 bg-card/50 p-3 flex flex-col">
-            <div className="text-base font-semibold mb-3">T‑Sync Creatium</div>
+            <div className="text-base font-semibold mb-3">Pragma Atlass</div>
             <nav className="flex flex-col gap-1">
               <Link to="/creatium" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Главная</Link>
               <Link to="/creatium/create" className="px-2 py-1 rounded bg-accent text-accent-foreground">Мои сайты</Link>
               <Link to="#" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Просмотр</Link>
             </nav>
-            {/* Guide section at bottom */}
-            <div className="mt-auto bg-[#111] rounded-2xl p-2 mb-[5px]">
-              <Button
-                variant="ghost"
-                className="w-full justify-between text-left rounded-2xl"
-                onClick={() => setIsGuideOpen(!isGuideOpen)}
-              >
-                <span>Руководство</span>
-                <ChevronUp className={`h-4 w-4 transition-transform ${isGuideOpen ? 'rotate-180' : ''}`} />
-              </Button>
-              {/* Expandable items with animation */}
-              <div
-                className={`transition-all duration-300 overflow-hidden ${isGuideOpen ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}
-              >
-                <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
-                  <div className="px-2 py-1 text-sm text-muted-foreground">Пункт 1</div>
-                  <div className="px-2 py-1 text-sm text-muted-foreground">Пункт 2</div>
-                  <div className="px-2 py-1 text-sm text-muted-foreground">Пункт 3</div>
-                </div>
-              </div>
-              {/* Progress bar always visible under items */}
-              <div className="mt-2 flex items-center gap-2 p-2 rounded">
-                <span className="text-xs text-muted-foreground w-8">{completedSteps}/3</span>
-                <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary transition-all duration-300"
-                    style={{ width: `${(completedSteps / 3) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
+            {/* Guide section removed on Create page to avoid duplication */}
           </aside>
 
           {/* Content area */}
-          <main className="flex-1 pr-[15px] pt-[15px] pb-[15px] bg-[#000] overflow-hidden">
+          <main className="flex-1 pr-[15px] pt-[15px] pb-[15px] bg-card/50 overflow-hidden">
             {/* Parent block with border and 15px padding, full viewport height */}
-            <div className="border rounded-2xl bg-[#111] shadow-sm p-[15px] h-[calc(100vh-30px)] overflow-hidden">
+            <div className="border rounded-2xl bg-card shadow-sm p-[15px] h-[calc(100vh-30px)] overflow-hidden">
               {/* <div className="flex items-center justify-between mb-4">
                 <div className="text-lg font-semibold">Редактор персонального сайта</div>
               </div> */}

@@ -152,7 +152,7 @@ const UserStats = ({ user }: UserStatsProps) => {
             <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
               <div>
                 <div className="font-medium text-blue-900">Создать первый проект</div>
-                <div className="text-sm text-blue-700">Начните работу с T-Sync Platform</div>
+                <div className="text-sm text-blue-700">Начните работу с Atlass Rise</div>
               </div>
               <Badge variant="outline" className="text-blue-600 border-blue-300">
                 В процессе
@@ -161,7 +161,7 @@ const UserStats = ({ user }: UserStatsProps) => {
             
             <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
               <div>
-                <div className="font-medium text-purple-900">Опубликовать пост в Tsygram</div>
+                <div className="font-medium text-purple-900">Опубликовать пост в Atlass Volt</div>
                 <div className="text-sm text-purple-700">Поделитесь своими достижениями</div>
               </div>
               <Badge variant="outline" className="text-purple-600 border-purple-300">
@@ -172,7 +172,7 @@ const UserStats = ({ user }: UserStatsProps) => {
             <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
               <div>
                 <div className="font-medium text-green-900">Создать персональный сайт</div>
-                <div className="text-sm text-green-700">Покажите себя в T-Creatium</div>
+                <div className="text-sm text-green-700">Покажите себя в Pragma Atlass</div>
               </div>
               <Badge variant="outline" className="text-green-600 border-green-300">
                 В процессе

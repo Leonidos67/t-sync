@@ -1,6 +1,5 @@
 import WorkspaceAnalytics from "@/components/workspace/workspace-analytics";
 import TrainingChart from "@/components/workspace/training-chart";
-import IntegrationsManager from "@/components/integrations/integrations-manager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RecentProjects from "@/components/workspace/project/recent-projects";
 import RecentTasks from "@/components/workspace/task/recent-tasks";
@@ -75,9 +74,7 @@ const WorkspaceDashboard = () => {
       <div className="mt-4">
         <TrainingChart />
       </div>
-      <div className="mt-4">
-        <IntegrationsManager />
-      </div>
+      {/* Блок подключенные аккаунты удалён по запросу */}
       <div className="mt-4 mb-4">
         <Tabs value={selectedZone} onValueChange={handleZoneChange} className="w-full border rounded-lg p-2 bg-card main-content dashboard-tabs">
           <div className="relative">
@@ -142,9 +139,7 @@ const WorkspaceDashboard = () => {
       <div className="mt-4">
         <TrainingChart />
       </div>
-      <div className="mt-4">
-        <IntegrationsManager />
-      </div>
+      {/* Блок подключенные аккаунты удалён по запросу */}
       <div className="mt-4 mb-8">
                   <Tabs value={selectedZone} onValueChange={handleZoneChange} className="w-full border rounded-lg p-2 bg-card">
           <div className="relative">

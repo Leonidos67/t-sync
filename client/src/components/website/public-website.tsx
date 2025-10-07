@@ -61,7 +61,7 @@ const PublicWebsite: React.FC<PublicWebsiteProps> = ({ website, username }) => {
                 size="sm"
                 onClick={handleShare}
               >
-                Made in T-Sync
+                Made in Pragma Atlass 
               </Button>
             </div>
           </div>
@@ -152,7 +152,7 @@ const PublicWebsite: React.FC<PublicWebsiteProps> = ({ website, username }) => {
           </div>
           
           <p className="text-sm text-gray-500">
-            Сайт создан с помощью <a className='text-black' target='_blank' href="https://t-sync-web.vercel.app">T-Sync</a>
+            Сайт создан с помощью <a className='text-black' target='_blank' href="https://t-sync-web.vercel.app">Pragma Atlass</a>
           </p>
           
           <div className="mt-4">

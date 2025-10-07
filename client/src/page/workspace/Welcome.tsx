@@ -111,14 +111,8 @@ const WorkspaceWelcome = () => {
                 to={`/workspace/${currentWorkspaceId}/`}
                 className="ml-2 items-center gap-2 self-center font-medium text-foreground"
               >
-                T-Sync
-                <span className="mx-2 px-2 py-0.5 rounded-full bg-foreground text-background text-xs font-semibold">beta</span>
+                Atlass Rise
               </Link>
-            </div>
-            {/* Centered menu items */}
-            <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-4">
-              <Link to="/creatium" className="text-sm font-medium transition-opacity hover:opacity-80">#T-Creatium</Link>
-              <Link to="#" className="text-sm font-medium transition-opacity hover:opacity-80">#Tsygram</Link>
             </div>
             <div className="flex items-center gap-2">
               <button type="button" className="p-2 rounded-md hover:bg-accent transition-colors duration-200">
@@ -133,9 +127,26 @@ const WorkspaceWelcome = () => {
           {/* Приветствие */}
           <div className="mb-6 flex items-center justify-center text-center">
             <div className="text-xl font-semibold text-foreground">
-              {workspaces.length === 0 
-                ? `Добро пожаловать в T-Sync, ${user?.name || "пользователь"}! 👋` 
-                : `Добро пожаловать в Тренерскую зону, ${user?.name || "пользователь"} 👋`}
+              {workspaces.length === 0 ? (
+                `👋 Добро пожаловать в Atlass Rise, ${user?.name || "пользователь"}!`
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span>
+                    {`👋 Добро пожаловать в Тренерскую зону, ${user?.name || "пользователь"}`}
+                  </span>
+                  <Link
+                    to={`/id/?tab=settings&settingsTab=location`}
+                    className="inline-flex items-center p-1 rounded-md hover:bg-accent transition-colors"
+                    aria-label="Редактировать личные данные"
+                  >
+                    {/* Using same icon as on ID page */}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-muted-foreground hover:text-foreground" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 
@@ -220,7 +231,7 @@ const WorkspaceWelcome = () => {
                           {workspaces.length === 0 ? "Создать первое рабочее пространство" : "Создать нового спортсмена"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {workspaces.length === 0 ? "Начать работу с T-Sync" : "Добавить участника"}
+                          {workspaces.length === 0 ? "Начать работу с Atlass Rise" : "Добавить участника"}
                         </span>
                       </div>
                     </div>

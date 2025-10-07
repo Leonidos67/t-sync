@@ -1,6 +1,6 @@
-appId: com.tsync.desktop
-productName: T-Sync Platform
-copyright: Copyright © 2024 T-Sync Team
+appId: com.atlass.rise.desktop
+productName: Atlass Rise
+copyright: Copyright © 2024 Atlass Team
 
 directories:
   output: dist
@@ -30,7 +30,7 @@ win:
         - x64
   icon: assets/icon.ico
   requestedExecutionLevel: asInvoker
-  publisherName: T-Sync Team
+  publisherName: Atlass Team
   verifyUpdateCodeSignature: false
 
 nsis:
@@ -40,7 +40,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: T-Sync Platform
+  shortcutName: Atlass Rise
   installerIcon: assets/icon.ico
   uninstallerIcon: assets/icon.ico
   installerHeaderIcon: assets/icon.ico

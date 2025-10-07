@@ -1,8 +1,8 @@
 {
-  "name": "t-sync-desktop",
+  "name": "atlass-rise-desktop",
   "version": "1.0.0",
-  "description": "T-Sync Desktop Application",
-  "author": "T-Sync Team",
+  "description": "Atlass Rise Desktop Application",
+  "author": "Atlass Team",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -15,8 +15,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "com.tsync.desktop",
-    "productName": "T-Sync Platform",
+    "appId": "com.atlass.rise.desktop",
+    "productName": "Atlass Rise",
     "directories": {
       "output": "dist"
     },
@@ -51,7 +51,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "T-Sync Platform"
+      "shortcutName": "Atlass Rise"
     }
   },
   "devDependencies": {

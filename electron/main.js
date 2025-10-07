@@ -86,7 +86,7 @@ function createWindow() {
   // Set window title with version for visibility
   const appVersion = app.getVersion ? app.getVersion() : '0.0.0';
   try {
-    mainWindow.setTitle(`T-Sync Platform v${appVersion}`);
+    mainWindow.setTitle(`Atlass Rise v${appVersion}`);
   } catch {}
 
   // Show window when ready
@@ -172,14 +172,14 @@ function createMenu() {
       label: 'Help',
       submenu: [
         {
-          label: 'About T-Sync',
+          label: 'About Atlass',
           click: () => {
             // Show about dialog
             const { dialog } = require('electron');
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About T-Sync',
-              message: 'T-Sync Desktop Application',
+              title: 'About Atlass',
+              message: 'Atlass Rise Desktop Application',
               detail: 'Version 1.5.0\nA platform for managing training sessions and workouts.'
             });
           }
@@ -215,7 +215,7 @@ app.on('before-quit', () => {
 });
 
 // Handle app protocol for deep linking (optional)
-app.setAsDefaultProtocolClient('tsync');
+app.setAsDefaultProtocolClient('atlass');
 
 // Security: Prevent new window creation
 app.on('web-contents-created', (event, contents) => {

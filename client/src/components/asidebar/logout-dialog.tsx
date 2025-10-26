@@ -13,6 +13,7 @@ import { logoutMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "lucide-react";
+import { removeToken } from "@/lib/tokenStorage";
 
 const LogoutDialog = (props: {
   isOpen: boolean;
@@ -26,6 +27,10 @@ const LogoutDialog = (props: {
   const { mutate, isPending } = useMutation({
     mutationFn: logoutMutationFn,
     onSuccess: () => {
+      // Удаляем JWT токен из localStorage
+      removeToken();
+      console.log('🔑 JWT token removed from localStorage');
+      
       queryClient.resetQueries({
         queryKey: ["authUser"],
       });

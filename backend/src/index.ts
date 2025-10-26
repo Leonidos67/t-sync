@@ -45,8 +45,9 @@ const sessionConfig = {
     // allow non-secure when FRONTEND_ORIGIN is localhost over http
     !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN),
   httpOnly: true,
-  // Use "lax" - works with Vercel proxy (same-site for browser)
-  sameSite: "lax",
+  // Use "none" for production cross-origin requests (direct to Railway)
+  // Use "lax" for localhost development
+  sameSite: config.NODE_ENV === "production" ? "none" : "lax",
 };
 
 console.log("Session config:", {
@@ -57,6 +58,26 @@ console.log("Session config:", {
 });
 
 app.use(session(sessionConfig as any));
+
+// Middleware to add Partitioned attribute to cookies for Chrome
+app.use((req, res, next) => {
+  const originalSetHeader = res.setHeader.bind(res);
+  res.setHeader = function (name: string, value: any) {
+    if (name.toLowerCase() === 'set-cookie' && config.NODE_ENV === 'production') {
+      const cookies = Array.isArray(value) ? value : [value];
+      const modifiedCookies = cookies.map((cookie: string) => {
+        // Add Partitioned attribute for Chrome third-party cookie support
+        if (cookie.includes('SameSite=None') && !cookie.includes('Partitioned')) {
+          return `${cookie}; Partitioned`;
+        }
+        return cookie;
+      });
+      return originalSetHeader(name, modifiedCookies.length === 1 ? modifiedCookies[0] : modifiedCookies);
+    }
+    return originalSetHeader(name, value);
+  };
+  next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());

@@ -46,7 +46,13 @@ app.use(
       // allow non-secure when FRONTEND_ORIGIN is localhost over http
       !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN),
     httpOnly: true,
-    sameSite: "lax",
+    // Use "none" for production cross-origin requests (Vercel <-> Railway)
+    // Use "lax" for localhost development
+    sameSite: config.NODE_ENV === "production" && 
+      !process.env.DESKTOP_APP && 
+      !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN) 
+      ? "none" 
+      : "lax",
   })
 );
 

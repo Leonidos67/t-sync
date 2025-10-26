@@ -434,7 +434,8 @@ export const getPublicFeedQueryFn = async () => {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12000);
   try {
-    const res = await fetch(`/api/user/public/feed`, {
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const res = await fetch(`${baseURL}/user/public/feed`, {
       method: 'GET',
       credentials: 'omit',
       signal: controller.signal,

@@ -116,7 +116,8 @@ const SocialMainPage = () => {
       } catch {
         // Fallback для неавторизованных пользователей
         try {
-          const res = await fetch("/api/user/public/feed");
+          const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+          const res = await fetch(`${baseURL}/user/public/feed`);
           if (res.ok) {
             const json = await res.json();
             if (isMounted) setPosts(json.posts || []);

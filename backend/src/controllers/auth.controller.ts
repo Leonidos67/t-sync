@@ -66,7 +66,7 @@ export const loginController = asyncHandler(
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Успешно вошел в систему",
-      user: user.omitPassword(),
+      user, // user уже без пароля, так как verifyUserService вызывает omitPassword()
       token, // Возвращаем JWT токен клиенту
     });
   }

@@ -18,6 +18,8 @@ dist/
 
 # Ignore large installer files
 client/public/downloads/*.exe
+# Разрешаем основной установщик для production
+!client/public/downloads/Aurora-Rise-Platform-Setup.exe
 client/public/downloads/*.zip
 client/public/downloads/*.dmg
 client/public/downloads/*.appimage

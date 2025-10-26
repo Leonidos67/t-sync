@@ -63,6 +63,12 @@ export const loginController = asyncHandler(
             return next(err);
           }
 
+          console.log("✅ Login successful, session created:", {
+            userId: user._id,
+            hasSession: !!(req as any).session,
+            sessionData: JSON.stringify((req as any).session).substring(0, 100),
+          });
+
           return res.status(HTTPSTATUS.OK).json({
             message: "Успешно вошел в систему",
             user,

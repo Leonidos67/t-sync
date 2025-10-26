@@ -420,9 +420,9 @@ export default function AiAssistant() {
             className="space-y-3 px-3 lg:px-6 py-3 scrollbar no-scrollbar"
             style={{
               // Prevent content from being hidden behind the fixed input
-              paddingBottom: (inputBoxHeight || 0) + 8,
+              paddingBottom: (inputBoxHeight || 0) - 50,
               // Constrain to viewport and enable internal scroll
-              maxHeight: `calc(100vh - ${(inputBoxHeight || 0) + 24}px)`,
+              maxHeight: `calc(100vh - ${(inputBoxHeight || 0) - 50}px)`,
               overflowY: 'auto',
             }}
           >

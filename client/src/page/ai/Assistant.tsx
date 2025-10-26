@@ -267,10 +267,17 @@ export default function AiAssistant() {
     if (!customMessage) setQuestion("");
 
     try {
+      // Отправляем последние 10 сообщений для контекста
+      const chatHistoryForAI = messages.slice(-10).map(m => ({
+        role: m.role,
+        text: m.text
+      }));
+      
       const response = await API.post("/v1/ai/query", { 
         prompt: promptWithAthletes,
         workspaceId,
-        selectedAthletes: selectedAthletes.length > 0 ? selectedAthletes : undefined
+        selectedAthletes: selectedAthletes.length > 0 ? selectedAthletes : undefined,
+        chatHistory: chatHistoryForAI
       });
 
       const data = response.data;

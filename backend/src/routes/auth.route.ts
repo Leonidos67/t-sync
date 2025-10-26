@@ -9,7 +9,7 @@ import {
   updateUserRoleController,
   autoLoginController,
 } from "../controllers/auth.controller";
-import isAuthenticated from "../middlewares/isAuthenticated.middleware";
+import jwtAuth from "../middlewares/jwtAuth.middleware";
 
 const failedUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`;
 
@@ -19,7 +19,7 @@ authRoutes.post("/register", registerUserController);
 authRoutes.post("/login", loginController);
 authRoutes.post("/auto-login", autoLoginController);
 authRoutes.post("/logout", logOutController);
-authRoutes.put("/role", isAuthenticated, updateUserRoleController);
+authRoutes.put("/role", jwtAuth, updateUserRoleController);
 
 authRoutes.get(
   "/google",

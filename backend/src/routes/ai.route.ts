@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import fetch from "node-fetch";
 import { config } from "../config/app.config";
-import isAuthenticated from "../middlewares/isAuthenticated.middleware";
+import jwtAuth from "../middlewares/jwtAuth.middleware";
 import TaskModel from "../models/task.model";
 import ProjectModel from "../models/project.model";
 import MemberModel from "../models/member.model";
@@ -11,7 +11,7 @@ import mongoose from "mongoose";
 
 const aiRoutes = Router();
 
-aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => {
+aiRoutes.post("/query", jwtAuth, async (req: Request, res: Response) => {
   try {
     const promptRaw = (req.body && (req.body as any).prompt) as unknown;
     const prompt = typeof promptRaw === "string" ? promptRaw : "";

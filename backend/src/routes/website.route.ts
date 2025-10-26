@@ -5,7 +5,7 @@ import {
   updateWebsiteController, 
   deleteWebsiteController 
 } from "../controllers/website.controller";
-import isAuthenticated from "../middlewares/isAuthenticated.middleware";
+import jwtAuth from "../middlewares/jwtAuth.middleware";
 
 const websiteRoutes = Router();
 
@@ -13,8 +13,8 @@ const websiteRoutes = Router();
 websiteRoutes.get("/:username", getWebsiteByUsernameController);
 
 // Защищенные маршруты для управления сайтом
-websiteRoutes.post("/create", isAuthenticated, createWebsiteController);
-websiteRoutes.put("/update", isAuthenticated, updateWebsiteController);
-websiteRoutes.delete("/delete", isAuthenticated, deleteWebsiteController);
+websiteRoutes.post("/create", jwtAuth, createWebsiteController);
+websiteRoutes.put("/update", jwtAuth, updateWebsiteController);
+websiteRoutes.delete("/delete", jwtAuth, deleteWebsiteController);
 
 export default websiteRoutes;

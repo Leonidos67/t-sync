@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
+import { config } from "../config/app.config";
 
 const router = express.Router();
 
@@ -9,10 +10,31 @@ router.get("/info", (req: Request, res: Response): void => {
   try {
     const downloadsPath = path.join(__dirname, "../../../client/public/downloads");
     
+    // Fallback для production, когда файлов нет на Railway
     if (!fs.existsSync(downloadsPath)) {
+      // Возвращаем хардкоженный список доступных файлов
+      const fallbackDownloads = [
+        {
+          filename: "T-Sync Platform Setup 1.0.0.exe",
+          platform: "Windows",
+          downloadUrl: `${config.FRONTEND_URL}/downloads/T-Sync Platform Setup 1.0.0.exe`,
+          sizeFormatted: "~100 MB",
+          isExe: true,
+          isDmg: false
+        },
+        {
+          filename: "Aurora Rise Setup 1.0.0.dmg",
+          platform: "macOS",
+          downloadUrl: `${config.FRONTEND_URL}/downloads/Aurora Rise Setup 1.0.0.dmg`,
+          sizeFormatted: "~100 MB",
+          isExe: false,
+          isDmg: true
+        }
+      ];
+      
       res.json({
-        success: false,
-        message: "Downloads folder not found"
+        success: true,
+        downloads: fallbackDownloads
       });
       return;
     }
@@ -41,7 +63,7 @@ router.get("/info", (req: Request, res: Response): void => {
         size: stats.size,
         sizeFormatted: formatFileSize(stats.size),
         lastModified: stats.mtime,
-        downloadUrl: `/downloads/${file}`,
+        downloadUrl: `${config.FRONTEND_URL}/downloads/${file}`,
         platform,
         isExe: lower.endsWith('.exe'),
         isDmg: lower.endsWith('.dmg')

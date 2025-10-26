@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Download, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { detectOS } from '@/lib/platform';
 
 // Platform Icons
 const WindowsIcon = () => (
-  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
     <path d="M0,3.41L9.96,2.14L9.98,11.81L0.03,11.83Zm9.96,8.61,0,9.67L0,20.42l0-8.39ZM11.03,2L24,0V11.79H11.03Zm0,10L24,12.03V24L11.03,21.96Z"/>
   </svg>
 );
@@ -26,7 +23,7 @@ const AppleIcon = () => (
 
 const LinuxIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.84-.41 1.738-.503 2.638-.04.379-.017.754.045 1.122.08.473.222.914.377 1.321.353 1.045.785 2.036 1.33 2.986.218.38.445.74.688 1.077.219.303.489.556.764.78.28.225.578.413.891.534.36.14.736.217 1.107.217.433 0 .857-.087 1.231-.232.445-.173.878-.459 1.26-.802.427-.384.794-.84 1.084-1.325.336-.566.579-1.188.733-1.839.233-.991.316-2.037.276-3.077-.024-.638-.073-1.276-.15-1.91-.075-.634-.168-1.266-.296-1.893-.162-.792-.37-1.577-.63-2.344l-.11-.331c-.083-.25-.174-.5-.276-.742-.102-.242-.213-.477-.336-.703-.247-.452-.517-.88-.806-1.29-.324-.458-.668-.896-1.029-1.312-.361-.415-.739-.81-1.13-1.183-.392-.373-.799-.723-1.219-1.052-.42-.329-.854-.637-1.297-.922-.443-.286-.9-.549-1.365-.79-.465-.24-.941-.457-1.423-.65-.482-.192-.971-.36-1.465-.502-.494-.142-.994-.257-1.497-.344-.503-.087-1.009-.148-1.517-.183C12.88.008 12.69 0 12.504 0z"/>
+    <path d="M12.5 0C11.5 0 11 1.5 11 2.5c0 .5 0 1 .5 1.5-.5.5-1 1.5-1 2.5 0 1.5 1 2.5 2 2.5s2-1 2-2.5c0-1-.5-2-1-2.5.5-.5.5-1 .5-1.5C14 1.5 13.5 0 12.5 0zm-1 9c-3 0-5.5 2-6.5 4.5-.5 1.5-.5 3 0 4 .5 1 1.5 1.5 2.5 1.5 1 0 1.5-.5 2-1.5.5 1 1 1.5 2 1.5s1.5-.5 2-1.5c.5 1 1 1.5 2 1.5s2-.5 2.5-1.5c.5-1 .5-2.5 0-4C17 11 14.5 9 11.5 9zm-1 3c.5 0 1 .5 1 1s-.5 1-1 1-1-.5-1-1 .5-1 1-1zm3 0c.5 0 1 .5 1 1s-.5 1-1 1-1-.5-1-1 .5-1 1-1zm-4.5 3c0 .5.5 1 1 1h3c.5 0 1-.5 1-1 0-.5-.5-1-1-1h-3c-.5 0-1 .5-1 1zm-4 5c-.5.5-1 1-1 2s.5 2 1.5 2c.5 0 1 0 1.5-.5l1-1.5c0-.5.5-1 .5-1.5 0-.5-.5-1-1-1-.5 0-1 0-1.5.5l-1 1zm11 0l-1-1c-.5-.5-1-.5-1.5-.5-.5 0-1 .5-1 1 0 .5.5 1 .5 1.5l1 1.5c.5.5 1 .5 1.5.5 1 0 1.5-1 1.5-2s-.5-1.5-1-2z"/>
   </svg>
 );
 
@@ -59,11 +56,13 @@ export function DownloadDropdown({
     { platform: 'Linux', filename: '', downloadUrl: '/downloads/Aurora-Rise-Platform.AppImage', icon: 'linux', available: false },
   ]);
   const [currentOS, setCurrentOS] = useState<string>('Unknown');
+  const [userRealOS, setUserRealOS] = useState<string>('Unknown'); // Real user OS (fixed)
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const detectedOS = detectOS();
     setCurrentOS(detectedOS);
+    setUserRealOS(detectedOS); // Store the real OS once
     
     // Fetch available downloads
     fetchDownloads();
@@ -122,59 +121,109 @@ export function DownloadDropdown({
   };
 
   // Get current OS download for main button
-  const currentDownload = downloads.find(d => d.platform === currentOS);
-  const mainButtonText = currentDownload 
-    ? `${buttonText} для ${currentOS}`
-    : buttonText;
+  const currentDownload = downloads.find(d => d.platform === currentOS) || downloads[0];
+  const mainButtonText = `${buttonText} для ${currentDownload.platform}`;
+
+  const handleMainButtonClick = () => {
+    handleDownload(currentDownload.downloadUrl, currentDownload.filename || `Aurora-Rise-${currentDownload.platform}`);
+  };
+
+  const handlePlatformSelect = (item: DownloadItem) => {
+    // Update current OS to selected platform
+    setCurrentOS(item.platform);
+    // Optionally auto-download after selection
+    // handleDownload(item.downloadUrl, item.filename || `Aurora-Rise-${item.platform}`);
+  };
+
+  // Get icon for current platform
+  const getCurrentIcon = () => {
+    switch (currentDownload.icon) {
+      case 'windows':
+        return <WindowsIcon />;
+      case 'apple':
+        return <AppleIcon />;
+      case 'linux':
+        return <LinuxIcon />;
+      default:
+        return <WindowsIcon />;
+    }
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          className={className}
-          variant={variant}
-          size={size}
-          disabled={isLoading}
-        >
-          {showIcon && (
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .15V5.21L20 3zM3 13l6 .09v6.81l-6-1.15V13zm17 .25V22l-10-1.91v-6.84l10 .15z"/>
-            </svg>
-          )}
-          {isLoading ? 'Загрузка...' : mainButtonText}
-          <ChevronDown className="w-4 h-4 ml-2" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-56">
-        <DropdownMenuLabel>Выберите платформу</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        
-        {downloads.map((item) => (
-          <DropdownMenuItem
-            key={item.platform}
-            className="cursor-pointer flex items-center gap-3"
-            onClick={() => handleDownload(item.downloadUrl, item.filename || `Aurora-Rise-${item.platform}`)}
-            disabled={item.platform === 'Linux'}
+    <div className={`inline-flex items-stretch ${className?.includes('w-full') ? 'w-full' : ''} ${className}`}>
+      {/* Main Download Button */}
+      <button
+        disabled={isLoading}
+        onClick={handleMainButtonClick}
+        className={`
+          inline-flex items-center justify-center rounded-l-lg px-4 py-2 flex-1
+          text-sm font-medium transition-colors
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+          disabled:pointer-events-none disabled:opacity-50
+          ${size === 'lg' ? 'h-12 px-6 text-lg' : size === 'sm' ? 'h-9 px-3 text-xs' : 'h-10 px-4'}
+          ${variant === 'default' ? 'bg-foreground text-background hover:bg-foreground/90' : ''}
+          ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground' : ''}
+        `}
+      >
+        {showIcon && (
+          <div className="mr-2 flex items-center justify-center">
+            {getCurrentIcon()}
+          </div>
+        )}
+        {isLoading ? 'Загрузка...' : mainButtonText}
+      </button>
+
+      {/* Vertical Divider */}
+      <div className={`
+        w-[1px] 
+        ${variant === 'default' ? 'bg-background/20' : 'bg-border'}
+      `} />
+
+      {/* Dropdown Trigger Button */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            disabled={isLoading}
+            className={`
+              inline-flex items-center justify-center rounded-r-lg px-2
+              text-sm font-medium transition-colors
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+              disabled:pointer-events-none disabled:opacity-50
+              ${size === 'lg' ? 'h-12' : size === 'sm' ? 'h-9' : 'h-10'}
+              ${variant === 'default' ? 'bg-foreground text-background hover:bg-foreground/90' : ''}
+              ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground border-l-0' : ''}
+            `}
           >
-            <div className="flex items-center justify-center w-5 h-5">
-              {item.icon === 'windows' && <WindowsIcon />}
-              {item.icon === 'apple' && <AppleIcon />}
-              {item.icon === 'linux' && <LinuxIcon />}
-            </div>
-            <div className="flex flex-col flex-1">
-              <span className="font-medium">
-                {item.platform}
-                {item.platform === currentOS && ' (Ваша ОС)'}
-              </span>
-              {item.platform === 'Linux' && (
-                <span className="text-xs text-muted-foreground">Скоро доступно</span>
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-auto"> 
+          {downloads.map((item) => (
+            <DropdownMenuItem
+              key={item.platform}
+              className="cursor-pointer flex items-center gap-3"
+              onClick={() => handlePlatformSelect(item)}
+              disabled={item.platform === 'Linux'}
+            >
+              <div className="flex items-center justify-center w-5 h-5">
+                {item.icon === 'windows' && <WindowsIcon />}
+                {item.icon === 'apple' && <AppleIcon />}
+                {item.icon === 'linux' && <LinuxIcon />}
+              </div>
+              <div className="flex flex-col flex-1">
+                <span className="font-medium">
+                  {item.platform}
+                  {item.platform === userRealOS && ' (Ваша ОС)'}
+                </span>
+              </div>
+              {item.platform === currentOS && (
+                <span className="text-xs text-muted-foreground">✓</span>
               )}
-            </div>
-            <Download className="w-4 h-4 text-muted-foreground" />
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 

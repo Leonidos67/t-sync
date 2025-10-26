@@ -54,7 +54,7 @@ const LandingPage: React.FC<LandingPageProps> = () => {
     {
       id: "aurora-rise-platform",
       icon: <Trophy className="size-4" />,
-      heading: "Aurora Rise Platform",
+      heading: "Aurora Rise",
       description: "Ведение тренировочного процесса с тренером или самостоятельно",
       image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
       url: "/services",
@@ -63,7 +63,7 @@ const LandingPage: React.FC<LandingPageProps> = () => {
     {
       id: "pragma-aurora-rise",
       icon: <Users className="size-4" />,
-      heading: "Pragma Aurora Rise",
+      heading: "Pragma",
       description: "Создание профессионального сайта-визитки для спортсмена",
       image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-2.svg",
       url: "/services",
@@ -72,7 +72,7 @@ const LandingPage: React.FC<LandingPageProps> = () => {
     {
       id: "aurora-rise-volt",
       icon: <Zap className="size-4" />,
-      heading: "Aurora Volt",
+      heading: "Volt",
       description: "Социальная сеть для спортсменов",
       image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-3.svg",
       url: "/services",
@@ -81,8 +81,8 @@ const LandingPage: React.FC<LandingPageProps> = () => {
     {
       id: "aurora-rise-id",
       icon: <Shield className="size-4" />,
-      heading: "Aurora Rise ID",
-      description: "Единый аккаунт для всей экосистемы Aurora Rise",
+      heading: "Aurora ID",
+      description: "Единый аккаунт для всей экосистемы Aurora",
       image: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/placeholder-1.svg",
       url: "/services",
       isDefault: false,
@@ -155,7 +155,7 @@ const LandingPage: React.FC<LandingPageProps> = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in max-w-md mx-auto">
             <DownloadDropdown 
               size="lg" 
-              className="bg-foreground text-background hover:bg-foreground/90 transition-colors text-lg h-12 min-h-[48px]"
+              className="transition-colors text-lg h-12 min-h-[48px]"
               buttonText="Скачать"
             />
             <Button 

@@ -3,8 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Sparkles, Sun, Moon, ArrowUpRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/theme-provider";
-import voltLogo from "@/assets/logo/volt.png";
 import { DownloadDropdown } from "./download-dropdown";
+import Logo from "@/components/logo";
+import SocialLogo from "@/components/logo/social-logo";
+import PragmaLogo from "@/components/logo/pragma-logo";
+import IdLogo from "@/components/logo/id-logo";
 
 const navItems = [
   { name: "Тарифы", path: "/pricing" },
@@ -17,44 +20,89 @@ const navItems = [
 
 const servicesCategories = [
   {
-    title: "Основные платформы",
+    title: "Наши сервисы",
     items: [
       {
-        title: "Aurora Rise Platform",
+        title: "Aurora Rise",
         description: "Ведение тренировочного процесса",
         path: "/services#platform",
-        icon: "🏋️‍♂️",
+        isLogo: true,
       },
       {
-        title: "Aurora Volt",
+        title: "Volt",
         description: "Социальная сеть для спортсменов",
         path: "/services#volt",
-        icon: voltLogo,
-        isImage: true,
+        isVolt: true,
       },
       {
-        title: "Aurora Rise ID",
-        description: "Единый аккаунт экосистемы",
-        path: "/services#id",
-        icon: "🆔",
-      },
-      {
-        title: "Pragma Aurora Rise",
+        title: "Pragma",
         description: "Создание сайта-визитки",
         path: "/services#pragma",
-        icon: "🌐",
+        isPragma: true,
       },
       {
-        title: "Aurora Analytics",
-        description: "Аналитика и статистика",
-        path: "/services#analytics",
+        title: "Aurora ID",
+        description: "Единый аккаунт экосистемы Aurora",
+        path: "/services#id",
+        isId: true,
+      },
+      // {
+      //   title: "Все сервисы",
+      //   path: "/services",
+      //   isSpecial: true,
+      // },
+    ],
+  },
+  {
+    title: "Быстрое начало",
+    items: [
+      {
+        title: "Создать рабочее пространство",
+        description: "Начните работу с командой",
+        path: "/workspace/create",
+        icon: "🏢",
+      },
+      {
+        title: "Создать проект",
+        description: "Новый спортивный проект",
+        path: "/projects/create",
+        icon: "📋",
+      },
+      {
+        title: "Добавить спортсмена",
+        description: "Пригласите нового участника",
+        path: "/members/add",
+        icon: "👤",
+      },
+      {
+        title: "Запланировать тренировку",
+        description: "Создайте новую задачу",
+        path: "/tasks/create",
+        icon: "📅",
+      },
+      {
+        title: "Просмотр статистики",
+        description: "Анализ прогресса команды",
+        path: "/analytics",
         icon: "📊",
       },
       {
-        title: "Aurora API",
-        description: "Интеграции и разработка",
-        path: "/services#api",
-        icon: "🔧",
+        title: "Шаблоны тренировок",
+        description: "Готовые решения",
+        path: "/templates",
+        icon: "📝",
+      },
+      {
+        title: "Настройки профиля",
+        description: "Управление аккаунтом",
+        path: "/settings",
+        icon: "⚙️",
+      },
+      {
+        title: "Документация",
+        description: "Руководство пользователя",
+        path: "/docs",
+        icon: "📖",
       },
     ],
   },
@@ -221,7 +269,7 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <button
                   onClick={toggleTheme}
                   className="flex items-center space-x-2 p-2 text-muted-foreground hover:text-primary transition-colors"
@@ -229,10 +277,15 @@ const Navbar = () => {
                   {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                   <span>{theme === 'dark' ? 'Светлая тема' : 'Темная тема'}</span>
                 </button>
-                <Button className="bg-gradient-primary hover:opacity-90 transition-opacity">
-                  Мой аккаунт
-                </Button>
               </div>
+              <DownloadDropdown 
+                size="lg" 
+                className="w-full"
+                buttonText="Скачать"
+              />
+              <Button className="w-full bg-gradient-primary hover:opacity-90 transition-opacity">
+                Войти
+              </Button>
             </div>
           </div>
         )}
@@ -249,40 +302,115 @@ const Navbar = () => {
           {/* Services Grid */}
           <div className="flex-1 overflow-y-auto">
             <div className="container mx-auto px-4 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 
                 {/* Left Column - Основные платформы */}
-                <div className="lg:col-span-1">
-                  <h3 className="text-xl font-bold text-foreground mb-6 text-center lg:text-left">
+                <div className="lg:col-span-2">
+                  <h3 className="text-xl font-bold text-foreground mb-2 text-center lg:text-left">
                     {servicesCategories[0].title}
                   </h3>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 border hover:shadow-lg rounded-lg">
                     {servicesCategories[0].items.map((service, serviceIndex) => (
                       <Link
                         key={serviceIndex}
                         to={service.path}
                         onClick={() => setIsServicesOpen(false)}
-                        className="group p-4 rounded-lg border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-card/50 hover:bg-card block"
+                        className={`group p-4 transition-all duration-300 block ${
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          (service as any).isSpecial
+                            ? 'bg-foreground dark:bg-foreground text-background dark:text-background'
+                            : ''
+                        }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="text-3xl group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-                            {service.isImage ? (
-                              <img src={service.icon} alt={service.title} className="w-8 h-8 object-contain" />
-                            ) : (
-                              service.icon
+                        <div className="flex flex-col items-center text-center gap-3">
+                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {(service as any).isSpecial ? (
+                            <>
+                              <div className="flex flex-col items-center justify-center gap-1 min-h-[4rem]">
+                                <h4 className="text-lg font-bold text-background dark:text-background transition-colors flex items-center gap-1">
+                                  {service.title}
+                                </h4>
+                                <ArrowUpRight className="w-12 h-12 text-background dark:text-background opacity-0 group-hover:opacity-100 transition-all duration-200 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                               <div className="flex items-center justify-center w-16 h-16 group-hover:scale-110 transition-transform duration-300">
+                                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                 {(service as any).isLogo ? (
+                                   <div className="scale-[2]">
+                                     <Logo url={null} />
+                                   </div>
+                                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                 ) : (service as any).isVolt ? (
+                                   <div className="scale-[2]">
+                                     <SocialLogo url={null} />
+                                   </div>
+                                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                 ) : (service as any).isPragma ? (
+                                   <div className="scale-[2]">
+                                     <PragmaLogo url={null} />
+                                   </div>
+                                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                 ) : (service as any).isId ? (
+                                   <div className="scale-[2]">
+                                     <IdLogo url={null} />
+                                   </div>
+                                 ) : (
+                                   <div className="text-5xl">
+                                     {('icon' in service) ? (service.icon as React.ReactNode) : null}
+                                   </div>
                             )}
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors mb-1">
+                               <div className="relative">
+                                 <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
                               {service.title}
                             </h4>
-                            <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors leading-relaxed">
+                                 {service.description && (
+                                   <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-2 bg-popover text-popover-foreground text-xs rounded-md shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
                               {service.description}
-                            </p>
+                                     <div className="absolute left-1/2 -translate-x-1/2 -top-1 w-2 h-2 bg-popover border-l border-t border-border rotate-45"></div>
+                                   </div>
+                                 )}
                           </div>
+                            </>
+                          )}
                         </div>
                       </Link>
                     ))}
+                  </div>
+
+                  {/* Быстрое начало */}
+                  <div className="mt-8">
+                    <h3 className="text-xl font-bold text-foreground mb-2 text-center lg:text-left">
+                      {servicesCategories[1].title}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {servicesCategories[1].items.map((item, itemIndex) => (
+                        <Link
+                          key={itemIndex}
+                          to={item.path}
+                          onClick={() => setIsServicesOpen(false)}
+                          className="group p-4 transition-all duration-300 block hover:bg-accent/50 rounded-lg"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex items-center justify-center w-10 h-10 flex-shrink-0 text-3xl group-hover:scale-110 transition-transform duration-300">
+                              {('icon' in item) ? (item.icon as React.ReactNode) : null}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors mb-1">
+                                {item.title}
+                              </h4>
+                              {item.description && (
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                  {item.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -322,11 +450,13 @@ const Navbar = () => {
                       </div>
                     </div>
                     
-                    <DownloadDropdown 
+                    <div className="flex justify-center rounded-b-3xl bg-primary px-4 md:px-0">
+                      <DownloadDropdown 
                       size="lg" 
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-b-3xl rounded-t-none w-full"
-                      buttonText="Скачать"
-                    />
+                        className="text-primary-foreground hover:bg-primary/90 transition-colors w-full md:w-auto"
+                        buttonText="Скачать"
+                      />
+                    </div>
                     
                   </div>
                 </div>

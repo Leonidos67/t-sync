@@ -113,7 +113,7 @@ const WorkspaceWelcome = () => {
                 to={`/workspace/${currentWorkspaceId}/`}
                 className="ml-2 items-center gap-2 self-center font-medium text-foreground"
               >
-                Aurora Rise Platform
+                Aurora Rise
               </Link>
             </div>
             <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ const WorkspaceWelcome = () => {
           <div className="mb-6 flex items-center justify-center text-center">
             <div className="text-xl font-semibold text-foreground">
               {workspaces.length === 0 ? (
-                `👋 Добро пожаловать в Aurora Rise Platform, ${user?.name || "пользователь"}!`
+                `👋 Добро пожаловать в Aurora Rise, ${user?.name || "пользователь"}!`
               ) : (
                 <div className="flex items-center gap-2">
                   <span>
@@ -233,7 +233,7 @@ const WorkspaceWelcome = () => {
                           {workspaces.length === 0 ? "Создать первое рабочее пространство" : "Создать нового спортсмена"}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {workspaces.length === 0 ? "Начать работу с Aurora Rise Platform" : "Добавить участника"}
+                          {workspaces.length === 0 ? "Начать работу с Aurora Rise" : "Добавить участника"}
                         </span>
                       </div>
                     </div>

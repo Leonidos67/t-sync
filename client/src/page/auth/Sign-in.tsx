@@ -25,6 +25,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { loginMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
+import { setToken } from "@/lib/tokenStorage";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -59,7 +60,15 @@ const SignIn = () => {
     mutate(values, {
       onSuccess: (data) => {
         const user = data.user;
+        const token = (data as any).token; // JWT токен от бэкенда
+        
         console.log('✅ Login successful:', user);
+        
+        // Сохраняем JWT токен в localStorage
+        if (token) {
+          setToken(token);
+          console.log('🔑 JWT token saved to localStorage');
+        }
         
         // Обновляем кеш аутентификации
         queryClient.setQueryData(["authUser"], { user });

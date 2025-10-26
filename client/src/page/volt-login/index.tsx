@@ -22,6 +22,7 @@ import SocialLogo from "@/components/logo/social-logo";
 import GoogleOauthButton from "@/components/auth/google-oauth-button";
 import { useMutation } from "@tanstack/react-query";
 import { loginMutationFn, autoLoginMutationFn } from "@/lib/api";
+import { setToken } from "@/lib/tokenStorage";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 import useVoltAuth from "@/hooks/api/use-volt-auth";
@@ -136,7 +137,15 @@ const VoltLogin = () => {
     mutate(values, {
       onSuccess: (data) => {
         const user = data.user;
+        const token = (data as any).token; // JWT токен от бэкенда
+        
         console.log(user);
+        
+        // Сохраняем JWT токен в localStorage
+        if (token) {
+          setToken(token);
+          console.log('🔑 JWT token saved to localStorage');
+        }
         
         // Проверяем, есть ли у пользователя username
         if (!user.username) {

@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { detectOS } from '@/lib/platform';
+import { SmartScreenWarning } from './SmartScreenWarning';
 
 // Platform Icons
 const WindowsIcon = () => (
@@ -150,79 +151,84 @@ export function DownloadDropdown({
   };
 
   return (
-    <div className={`inline-flex items-stretch ${className?.includes('w-full') ? 'w-full' : ''} ${className}`}>
-      {/* Main Download Button */}
-      <button
-        disabled={isLoading}
-        onClick={handleMainButtonClick}
-        className={`
-          inline-flex items-center justify-center rounded-l-lg px-4 py-2 flex-1
-          text-sm font-medium transition-colors
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-          disabled:pointer-events-none disabled:opacity-50
-          ${size === 'lg' ? 'h-12 px-6 text-lg' : size === 'sm' ? 'h-9 px-3 text-xs' : 'h-10 px-4'}
-          ${variant === 'default' ? 'bg-foreground text-background hover:bg-foreground/90' : ''}
-          ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground' : ''}
-        `}
-      >
-        {showIcon && (
-          <div className="mr-2 flex items-center justify-center">
-            {getCurrentIcon()}
-          </div>
-        )}
-        {isLoading ? 'Загрузка...' : mainButtonText}
-      </button>
+    <div className="flex flex-col items-center gap-2">
+      <div className={`inline-flex items-stretch ${className?.includes('w-full') ? 'w-full' : ''} ${className}`}>
+        {/* Main Download Button */}
+        <button
+          disabled={isLoading}
+          onClick={handleMainButtonClick}
+          className={`
+            inline-flex items-center justify-center rounded-l-lg px-4 py-2 flex-1
+            text-sm font-medium transition-colors
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+            disabled:pointer-events-none disabled:opacity-50
+            ${size === 'lg' ? 'h-12 px-6 text-lg' : size === 'sm' ? 'h-9 px-3 text-xs' : 'h-10 px-4'}
+            ${variant === 'default' ? 'bg-foreground text-background hover:bg-foreground/90' : ''}
+            ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground' : ''}
+          `}
+        >
+          {showIcon && (
+            <div className="mr-2 flex items-center justify-center">
+              {getCurrentIcon()}
+            </div>
+          )}
+          {isLoading ? 'Загрузка...' : mainButtonText}
+        </button>
 
-      {/* Vertical Divider */}
-      <div className={`
-        w-[1px] 
-        ${variant === 'default' ? 'bg-background/20' : 'bg-border'}
-      `} />
+        {/* Vertical Divider */}
+        <div className={`
+          w-[1px] 
+          ${variant === 'default' ? 'bg-background/20' : 'bg-border'}
+        `} />
 
-      {/* Dropdown Trigger Button */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            disabled={isLoading}
-            className={`
-              inline-flex items-center justify-center rounded-r-lg px-2
-              text-sm font-medium transition-colors
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
-              disabled:pointer-events-none disabled:opacity-50
-              ${size === 'lg' ? 'h-12' : size === 'sm' ? 'h-9' : 'h-10'}
-              ${variant === 'default' ? 'bg-foreground text-background hover:bg-foreground/90' : ''}
-              ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground border-l-0' : ''}
-            `}
-          >
-            <ChevronDown className="w-4 h-4" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-auto"> 
-          {downloads.map((item) => (
-            <DropdownMenuItem
-              key={item.platform}
-              className="cursor-pointer flex items-center gap-3"
-              onClick={() => handlePlatformSelect(item)}
-              disabled={item.platform === 'Linux'}
+        {/* Dropdown Trigger Button */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              disabled={isLoading}
+              className={`
+                inline-flex items-center justify-center rounded-r-lg px-2
+                text-sm font-medium transition-colors
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+                disabled:pointer-events-none disabled:opacity-50
+                ${size === 'lg' ? 'h-12' : size === 'sm' ? 'h-9' : 'h-10'}
+                ${variant === 'default' ? 'bg-foreground text-background hover:bg-foreground/90' : ''}
+                ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground border-l-0' : ''}
+              `}
             >
-              <div className="flex items-center justify-center w-5 h-5">
-                {item.icon === 'windows' && <WindowsIcon />}
-                {item.icon === 'apple' && <AppleIcon />}
-                {item.icon === 'linux' && <LinuxIcon />}
-              </div>
-              <div className="flex flex-col flex-1">
-                <span className="font-medium">
-                  {item.platform}
-                  {item.platform === userRealOS && ' (Ваша ОС)'}
-                </span>
-              </div>
-              {item.platform === currentOS && (
-                <span className="text-xs text-muted-foreground">✓</span>
-              )}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-auto"> 
+            {downloads.map((item) => (
+              <DropdownMenuItem
+                key={item.platform}
+                className="cursor-pointer flex items-center gap-3"
+                onClick={() => handlePlatformSelect(item)}
+                disabled={item.platform === 'Linux'}
+              >
+                <div className="flex items-center justify-center w-5 h-5">
+                  {item.icon === 'windows' && <WindowsIcon />}
+                  {item.icon === 'apple' && <AppleIcon />}
+                  {item.icon === 'linux' && <LinuxIcon />}
+                </div>
+                <div className="flex flex-col flex-1">
+                  <span className="font-medium">
+                    {item.platform}
+                    {item.platform === userRealOS && ' (Ваша ОС)'}
+                  </span>
+                </div>
+                {item.platform === currentOS && (
+                  <span className="text-xs text-muted-foreground">✓</span>
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
+      {/* SmartScreen Warning for Windows */}
+      {currentOS === 'Windows' && <SmartScreenWarning />}
     </div>
   );
 }

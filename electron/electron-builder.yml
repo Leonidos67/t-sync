@@ -32,6 +32,9 @@ win:
   requestedExecutionLevel: asInvoker
   publisherName: Aurora Team
   verifyUpdateCodeSignature: false
+  # Раскомментировать после получения сертификата:
+  # certificateFile: path/to/certificate.pfx
+  # certificatePassword: YOUR_PASSWORD
 
 nsis:
   oneClick: false

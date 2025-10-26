@@ -8,6 +8,7 @@ const appConfig = () => ({
 
   SESSION_SECRET: getEnv("SESSION_SECRET", "wotbmadgamesexe123"),
   SESSION_EXPIRES_IN: getEnv("SESSION_EXPIRES_IN", "1d"),
+  JWT_SECRET: getEnv("JWT_SECRET", "aurora-rise-jwt-secret-key-2025-local-dev"),
 
   GOOGLE_CLIENT_ID: getEnv("GOOGLE_CLIENT_ID", "1072181846694-el2tmva90ht6vmlias91ddt0gbhgcngi.apps.googleusercontent.com"),
   GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET", "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"),

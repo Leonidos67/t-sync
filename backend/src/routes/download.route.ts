@@ -15,20 +15,12 @@ router.get("/info", (req: Request, res: Response): void => {
       // Возвращаем хардкоженный список доступных файлов
       const fallbackDownloads = [
         {
-          filename: "T-Sync Platform Setup 1.0.0.exe",
+          filename: "Aurora-Rise-Platform-Setup.exe",
           platform: "Windows",
-          downloadUrl: `${config.FRONTEND_URL}/downloads/T-Sync Platform Setup 1.0.0.exe`,
+          downloadUrl: `${config.FRONTEND_URL}/downloads/Aurora-Rise-Platform-Setup.exe`,
           sizeFormatted: "~100 MB",
           isExe: true,
           isDmg: false
-        },
-        {
-          filename: "Aurora Rise Setup 1.0.0.dmg",
-          platform: "macOS",
-          downloadUrl: `${config.FRONTEND_URL}/downloads/Aurora Rise Setup 1.0.0.dmg`,
-          sizeFormatted: "~100 MB",
-          isExe: false,
-          isDmg: true
         }
       ];
       

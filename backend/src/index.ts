@@ -45,9 +45,8 @@ const sessionConfig = {
     // allow non-secure when FRONTEND_ORIGIN is localhost over http
     !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN),
   httpOnly: true,
-  // Use "none" for production cross-origin requests (Vercel <-> Railway)
-  // Use "lax" for localhost development
-  sameSite: config.NODE_ENV === "production" ? "none" : "lax",
+  // Use "lax" - works with Vercel proxy (same-site for browser)
+  sameSite: "lax",
 };
 
 console.log("Session config:", {

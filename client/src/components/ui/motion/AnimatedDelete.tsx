@@ -59,6 +59,7 @@ const AnimatedDelete = ({ className, isAnimating = false }: AnimatedDeleteProps)
             normal: { d: "M19 8v12c0 1-1 2-2 2H7c-1 0-2-1-2-2V8" },
             animate: { d: "M19 9v12c0 1-1 2-2 2H7c-1 0-2-1-2-2V9" },
           }}
+          initial="normal"
           animate={controls}
           transition={springTransition}
         />

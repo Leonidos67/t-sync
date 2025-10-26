@@ -6,8 +6,8 @@ const IdLogo = (props: { url?: string | null }) => {
   const { url = "/id" } = props;
   const content = (
     <div className="inline-flex items-center justify-center rounded-[4px] bg-black dark:bg-white p-1">
-      <img src={logoDark} alt="Atlass Rise" className="block dark:hidden h-3 w-3 object-contain" />
-      <img src={logoLight} alt="Atlass Rise" className="hidden dark:block h-3 w-3 object-contain" />
+      <img src={logoDark} alt="Aurora Rise" className="block dark:hidden h-3 w-3 object-contain" />
+      <img src={logoLight} alt="Aurora Rise" className="hidden dark:block h-3 w-3 object-contain" />
     </div>
   );
 

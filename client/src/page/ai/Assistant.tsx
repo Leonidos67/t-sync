@@ -7,7 +7,8 @@ import SiriOrb from "@/components/smoothui/ui/SiriOrb";
 import { useLocation, useNavigate } from "react-router-dom";
 import useWorkspaceId from "@/hooks/use-workspace-id";
 import useGetWorkspaceMembers from "@/hooks/api/use-get-workspace-members";
-import { Send, Plus, Trash, Check, X } from "lucide-react";
+import { Send, Plus, Trash, Check, X, Copy as CopyIcon, ThumbsUp, ThumbsDown, RefreshCw } from "lucide-react";
+import useCreateProjectDialog from "@/hooks/use-create-project-dialog";
 import BottomSheet from "@/components/ui/bottom-sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -18,6 +19,10 @@ type ChatMessage = {
   role: "user" | "model" | "system";
   text: string;
   rooms?: RoomOption[];
+  // feedback and metadata
+  liked?: boolean;
+  disliked?: boolean;
+  originalPrompt?: string;
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL as string | undefined;
@@ -37,6 +42,7 @@ export default function AiAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const hasLoadedFromStorageRef = useRef(false);
   const [showInput, setShowInput] = useState(true);
   const [expandedRoom, setExpandedRoom] = useState<{ messageIndex: number; roomId: string } | null>(null);
   const isMobile = useIsMobile();
@@ -47,6 +53,8 @@ export default function AiAssistant() {
   const [inlineAskVisible, setInlineAskVisible] = useState(false);
   const [inlineAskPos, setInlineAskPos] = useState<{ top: number; left: number } | null>(null);
   const [inlineSelectedText, setInlineSelectedText] = useState("");
+  const [copiedMessageIndex, setCopiedMessageIndex] = useState<number | null>(null);
+  const { onOpen: openCreateProjectDialog } = useCreateProjectDialog();
 
   
 
@@ -57,25 +65,47 @@ export default function AiAssistant() {
     const savedMessages = localStorage.getItem(storageKey);
     if (savedMessages) {
       try {
-        const parsedMessages = JSON.parse(savedMessages);
-        setMessages(parsedMessages);
+        const parsed = JSON.parse(savedMessages);
+        if (Array.isArray(parsed)) {
+          setMessages(parsed);
+        }
       } catch (e) {
         console.error('Failed to parse saved messages:', e);
       }
     } else {
       setMessages([]);
     }
+    // Помечаем, что первая попытка загрузки из localStorage состоялась,
+    // чтобы следующий эффект сохранения не стёр данные раньше времени
+    hasLoadedFromStorageRef.current = true;
   }, [workspaceId]);
 
   // Сохраняем сообщения в localStorage при изменении (на уровне рабочего пространства)
   useEffect(() => {
     if (!workspaceId) return;
+    if (!hasLoadedFromStorageRef.current) return;
     const storageKey = `ai-chat-messages:${workspaceId}`;
     if (messages.length > 0) {
       localStorage.setItem(storageKey, JSON.stringify(messages));
-    } else {
-      localStorage.removeItem(storageKey);
     }
+    // Если сообщений нет, ничего не делаем — не очищаем storage, чтобы избежать гонок
+  }, [messages, workspaceId]);
+
+  // Сохраняем перед закрытием/обновлением вкладки как дополнительная страховка
+  useEffect(() => {
+    const handler = () => {
+      if (!workspaceId) return;
+      const storageKey = `ai-chat-messages:${workspaceId}`;
+      if (messages.length > 0) {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(messages));
+        } catch {
+          void 0; // ignore storage errors
+        }
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
   }, [messages, workspaceId]);
 
   // Префилл вопроса из router state (например, из выделенного текста)
@@ -254,6 +284,7 @@ export default function AiAssistant() {
         credentials: "include",
         body: JSON.stringify({ 
           prompt: promptWithAthletes,
+          workspaceId,
           selectedAthletes: selectedAthletes.length > 0 ? selectedAthletes : undefined
         }),
       });
@@ -266,7 +297,11 @@ export default function AiAssistant() {
       const data = await res.json();
       const answer = data?.answer || "";
       const rooms = Array.isArray(data?.rooms) ? (data.rooms as RoomOption[]) : undefined;
-      setMessages((prev) => [...prev, { role: "model", text: (answer || "").trim() || "(пустой ответ)", rooms }]);
+      setMessages((prev) => {
+        // try to attach originalPrompt from the most recent user message
+        const lastUser = [...prev].reverse().find(m => m.role === "user");
+        return [...prev, { role: "model", text: (answer || "").trim() || "(пустой ответ)", rooms, originalPrompt: lastUser?.text }];
+      });
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : "Неизвестная ошибка";
       setError(errorMessage);
@@ -287,31 +322,54 @@ export default function AiAssistant() {
   }, [messages.length]);
 
   const renderTextWithLinks = (text: string) => {
-    const linkPattern = /(https?:\/\/[^\s]+|\/workspace\/[\w\-/]+)/g;
+    // Обрабатываем markdown ссылки [текст](url)
+    const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
     const elements: (string | JSX.Element)[] = [];
     let lastIndex = 0;
     let match: RegExpExecArray | null;
-    while ((match = linkPattern.exec(text)) !== null) {
-      const url = match[0];
+    
+    while ((match = markdownLinkPattern.exec(text)) !== null) {
+      const fullMatch = match[0];
+      const linkText = match[1];
+      const url = match[2];
       const start = match.index;
+      
       if (start > lastIndex) {
         elements.push(text.slice(lastIndex, start));
       }
-      elements.push(
-        <a key={`${start}-${url}`} href={url} className="underline text-blue-600" onClick={() => {
-          // allow client-side routing for internal links
-          if (url.startsWith("/")) {
-            // default behavior works with react-router <a href> in this app
-          }
-        }}>
-          {url}
-        </a>
-      );
-      lastIndex = start + url.length;
+      
+      // Специальная обработка для создания комнаты
+      if (url === "/workspace/create-room") {
+        elements.push(
+          <button
+            key={`${start}-create-room`}
+            className="underline text-blue-600 hover:text-blue-800 cursor-pointer"
+            onClick={() => openCreateProjectDialog()}
+          >
+            {linkText}
+          </button>
+        );
+      } else {
+        elements.push(
+          <a key={`${start}-${url}`} href={url} className="underline text-blue-600" onClick={() => {
+            // allow client-side routing for internal links
+            if (url.startsWith("/")) {
+              // default behavior works with react-router <a href> in this app
+            }
+          }}>
+            {linkText}
+          </a>
+        );
+      }
+      
+      lastIndex = start + fullMatch.length;
     }
+    
+    // Если есть остаток текста после всех markdown ссылок, добавляем его
     if (lastIndex < text.length) {
       elements.push(text.slice(lastIndex));
     }
+    
     return elements;
   };
 
@@ -427,6 +485,62 @@ export default function AiAssistant() {
                       }`}>
                         {m.role === "user" ? m.text : renderTextWithLinks(m.text)}
                       </div>
+                      {m.role === "model" && (
+                        <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                          <button
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground ai-hover-effect ${m.liked ? "" : ""}`}
+                            onClick={() => {
+                              setMessages(prev => prev.map((msg, i) => i === idx ? { ...msg, liked: !msg.liked, disliked: msg.liked ? msg.disliked : false } : msg));
+                            }}
+                            title="Нравится"
+                          >
+                            <ThumbsUp className="h-3 w-3" fill={m.liked ? 'currentColor' : 'none'} strokeWidth={m.liked ? 1.75 : 2} />
+                          </button>
+                          <button
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground ai-hover-effect ${m.disliked ? "" : ""}`}
+                            onClick={() => {
+                              setMessages(prev => prev.map((msg, i) => i === idx ? { ...msg, disliked: !msg.disliked, liked: msg.disliked ? msg.liked : false } : msg));
+                            }}
+                            title="Не нравится"
+                          >
+                            <ThumbsDown className="h-3 w-3" fill={m.disliked ? 'currentColor' : 'none'} strokeWidth={m.disliked ? 1.75 : 2} />
+                          </button>
+                          <button
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground ai-hover-effect"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(m.text || "");
+                                setCopiedMessageIndex(idx);
+                                setTimeout(() => setCopiedMessageIndex(null), 2000);
+                              } catch (e) {
+                                console.error('Failed to copy text:', e);
+                              }
+                            }}
+                            title="Скопировать ответ"
+                          >
+                            {copiedMessageIndex === idx ? (
+                              <Check className="h-3 w-3" />
+                            ) : (
+                              <CopyIcon className="h-3 w-3" />
+                            )}
+                            <span>{copiedMessageIndex === idx ? "Скопировано" : "Скопировать ответ"}</span>
+                          </button>
+                          <button
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground ai-hover-effect"
+                            onClick={() => {
+                              const prompt = m.originalPrompt || "";
+                              if (prompt) {
+                                // запускаем повтор запроса без изменения инпута
+                                void ask(prompt);
+                              }
+                            }}
+                            title="Повторить запрос"
+                          >
+                            <RefreshCw className="h-3 w-3" />
+                            <span>Повторить запрос</span>
+                          </button>
+                        </div>
+                      )}
                       {m.role === "model" && m.rooms && m.rooms.length > 0 && (
                         <div className="mt-2 block">
                           <div className="flex gap-2 flex-wrap" style={{ maxWidth: '500px' }}>

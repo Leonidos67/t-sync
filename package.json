@@ -1,7 +1,7 @@
 {
-  "name": "atlass-rise-desktop",
+  "name": "aurora-rise-desktop",
   "version": "1.0.0",
-  "description": "Atlass Rise Desktop Application - Platform for managing training sessions",
+  "description": "Aurora Rise Desktop Application - Platform for managing training sessions",
   "main": "electron/main.js",
   "scripts": {
     "setup": "node build-scripts/setup-env.js",
@@ -26,6 +26,6 @@
     "workout",
     "sports"
   ],
-  "author": "Atlass Rise Team",
+  "author": "Aurora Rise Team",
   "license": "MIT"
 }

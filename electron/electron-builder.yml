@@ -1,6 +1,6 @@
-appId: com.atlass.rise.desktop
-productName: Atlass Rise
-copyright: Copyright © 2024 Atlass Team
+appId: com.Aurora.rise.desktop
+productName: Aurora Rise
+copyright: Copyright © 2024 Aurora Team
 
 directories:
   output: dist
@@ -30,7 +30,7 @@ win:
         - x64
   icon: assets/icon.ico
   requestedExecutionLevel: asInvoker
-  publisherName: Atlass Team
+  publisherName: Aurora Team
   verifyUpdateCodeSignature: false
 
 nsis:
@@ -40,7 +40,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Atlass Rise
+  shortcutName: Aurora Rise
   installerIcon: assets/icon.ico
   uninstallerIcon: assets/icon.ico
   installerHeaderIcon: assets/icon.ico

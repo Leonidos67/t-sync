@@ -142,14 +142,63 @@ const followerSchema = new Schema({
 
 export const FollowerModel = mongoose.model("Follower", followerSchema);
 
+export interface ClubDocument extends Document {
+  name: string;
+  username: string;
+  description: string;
+  avatar: string | null;
+  creator: mongoose.Types.ObjectId;
+  members: mongoose.Types.ObjectId[];
+  actionButton: {
+    show: boolean;
+    type: 'website' | 'phone' | 'email';
+    value: string;
+    text: string;
+  };
+  showCreator: boolean;
+  createdAt: Date;
+}
+
 const postSchema = new Schema({
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  author: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    required: true,
+    refPath: 'authorType'
+  },
+  authorType: {
+    type: String,
+    enum: ['User', 'Club'],
+    default: 'User'
+  },
   text: { type: String, required: true },
   image: { type: String, default: null },
+  location: { type: String, default: null },
+  isPublic: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  fires: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  wows: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 export const PostModel = mongoose.model("Post", postSchema);
+
+const clubSchema = new Schema({
+  name: { type: String, required: true },
+  username: { type: String, required: true, unique: true, lowercase: true },
+  description: { type: String, default: "" },
+  avatar: { type: String, default: null },
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  actionButton: {
+    show: { type: Boolean, default: false },
+    type: { type: String, enum: ['website', 'phone', 'email'], default: 'website' },
+    value: { type: String, default: '' },
+    text: { type: String, default: 'Перейти' }
+  },
+  showCreator: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+export const ClubModel = mongoose.model<ClubDocument>("Club", clubSchema);
 
 export default UserModel;

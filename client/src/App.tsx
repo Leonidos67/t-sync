@@ -72,16 +72,16 @@ function App() {
         const installer = data.downloads.find((d) => d.filename?.toLowerCase().endsWith('.exe')) || data.downloads[0];
         const link = document.createElement('a');
         link.href = installer.downloadUrl;
-        link.download = installer.filename || 'Atlass-Rise-Platform-Setup.exe';
+        link.download = installer.filename || 'Aurora-Rise-Platform-Setup.exe';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
         // fallback direct link if API unavailable
-        window.location.href = '/downloads/Atlass-Rise-Platform-Setup.exe';
+        window.location.href = '/downloads/Aurora-Rise-Platform-Setup.exe';
       }
     } catch {
-      window.location.href = '/downloads/Atlass-Rise-Platform-Setup.exe';
+      window.location.href = '/downloads/Aurora-Rise-Platform-Setup.exe';
     }
   };
 

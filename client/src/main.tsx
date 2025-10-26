@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { NuqsAdapter } from "nuqs/adapters/react";
 
 import "./index.css";
+import "./styles/tsygram-theme.css";
 import App from "./App.tsx";
 import QueryProvider from "./context/query-provider.tsx";
 import { ThemeProvider } from "./context/theme-provider.tsx";

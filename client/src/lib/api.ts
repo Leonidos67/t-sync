@@ -37,6 +37,14 @@ export const loginMutationFn = async (
   return response.data;
 };
 
+export const autoLoginMutationFn = async (
+  email: string,
+  targetService: string = 'volt'
+): Promise<LoginResponseType & { targetService?: string }> => {
+  const response = await API.post("/auth/auto-login", { email, targetService });
+  return response.data;
+};
+
 export const registerMutationFn = async (data: registerType) =>
   await API.post("/auth/register", data);
 
@@ -49,8 +57,15 @@ export const updateUserRoleMutationFn = async (userRole: "coach" | "athlete") =>
 
 export const getCurrentUserQueryFn =
   async (): Promise<CurrentUserResponseType> => {
-    const response = await API.get(`/user/current`);
-    return response.data;
+    console.log('🔍 getCurrentUserQueryFn - Starting request to /user/current');
+    try {
+      const response = await API.get(`/user/current`);
+      console.log('🔍 getCurrentUserQueryFn - Success:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('🔍 getCurrentUserQueryFn - Error:', error);
+      throw error;
+    }
   };
 
 //********* WORKSPACE ****************
@@ -399,13 +414,58 @@ export const likeUserPostMutationFn = async (postId: string) => {
   return response.data;
 };
 
+export const fireUserPostMutationFn = async (postId: string) => {
+  const response = await API.post(`/user/posts/${postId}/fire`);
+  return response.data as { fired: boolean; firesCount: number };
+};
+
+export const wowUserPostMutationFn = async (postId: string) => {
+  const response = await API.post(`/user/posts/${postId}/wow`);
+  return response.data as { wowed: boolean; wowsCount: number };
+};
+
 export const getFeedQueryFn = async () => {
   const response = await API.get(`/user/feed`);
   return response.data;
 };
 
+export const getPublicFeedQueryFn = async () => {
+  // Use fetch without credentials to avoid CORS/cookie preflights and axios timeouts for public feed
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const res = await fetch(`/api/user/public/feed`, {
+      method: 'GET',
+      credentials: 'omit',
+      signal: controller.signal,
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+    if (!res.ok) throw new Error(`Public feed error: ${res.status}`);
+    return await res.json();
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+export const getAllPublicUsersQueryFn = async () => {
+  const response = await API.get(`/user/public/all`);
+  return response.data;
+};
+
+export const getAllPublicClubsQueryFn = async () => {
+  const response = await API.get(`/user/public/clubs`);
+  return response.data;
+};
+
 export const searchUsersQueryFn = async (query: string) => {
   const response = await API.get(`/user/search?query=${encodeURIComponent(query)}`);
+  return response.data;
+};
+
+export const searchClubsQueryFn = async (query: string) => {
+  const response = await API.get(`/user/clubs/search?query=${encodeURIComponent(query)}`);
   return response.data;
 };
 
@@ -427,5 +487,105 @@ export const updateWebsiteMutationFn = async (data: CreateWebsiteType): Promise<
 
 export const deleteWebsiteMutationFn = async (): Promise<{ message: string }> => {
   const response = await API.delete("/website/delete");
+  return response.data;
+};
+
+// CLUB API
+export const createClubMutationFn = async (data: { name: string; username: string; description?: string }) => {
+  const response = await API.post("/user/clubs", data);
+  return response.data;
+};
+
+export const getAllClubsQueryFn = async () => {
+  const response = await API.get("/user/clubs");
+  return response.data;
+};
+
+export const getClubByUsernameQueryFn = async (username: string) => {
+  const response = await API.get(`/user/clubs/${username}`);
+  return response.data;
+};
+
+export const getUserCreatedClubsQueryFn = async () => {
+  const response = await API.get("/user/clubs/my");
+  return response.data;
+};
+
+export const joinClubMutationFn = async (clubId: string) => {
+  const response = await API.post(`/user/clubs/${clubId}/join`);
+  return response.data;
+};
+
+export const leaveClubMutationFn = async (clubId: string) => {
+  const response = await API.post(`/user/clubs/${clubId}/leave`);
+  return response.data;
+};
+
+export const deleteClubMutationFn = async (clubId: string) => {
+  const response = await API.delete(`/user/clubs/${clubId}`);
+  return response.data;
+};
+
+export const updateClubActionButtonMutationFn = async (data: {
+  clubId: string;
+  showActionButton: boolean;
+  actionType: string;
+  actionValue: string;
+  buttonText: string;
+}) => {
+  const response = await API.patch(`/user/clubs/${data.clubId}/action-button`, {
+    showActionButton: data.showActionButton,
+    actionType: data.actionType,
+    actionValue: data.actionValue,
+    buttonText: data.buttonText
+  });
+  return response.data;
+};
+
+export const updateClubAppearanceMutationFn = async (data: {
+  clubId: string;
+  showCreator: boolean;
+}) => {
+  const response = await API.patch(`/user/clubs/${data.clubId}/appearance`, {
+    showCreator: data.showCreator
+  });
+  return response.data;
+};
+
+export const uploadClubAvatarMutationFn = async (data: {
+  clubId: string;
+  avatar: File;
+}) => {
+  const formData = new FormData();
+  formData.append('avatar', data.avatar);
+  
+  const response = await API.post(`/user/clubs/${data.clubId}/avatar`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const removeClubAvatarMutationFn = async (data: {
+  clubId: string;
+}) => {
+  const response = await API.delete(`/user/clubs/${data.clubId}/avatar`);
+  return response.data;
+};
+
+// CLUB POSTS API
+export const getClubPostsQueryFn = async (username: string) => {
+  const response = await API.get(`/user/clubs/${username}/posts`);
+  return response.data;
+};
+
+export const createClubPostMutationFn = async (username: string, data: { 
+  text: string; 
+  image?: string | null; 
+  location?: string; 
+  isPublic?: boolean 
+}) => {
+  const response = await API.post(`/user/clubs/${username}/posts`, data);
   return response.data;
 };

@@ -19,11 +19,12 @@ if (!fs.existsSync(electronDistPath)) {
 
 // Ищем установщик в electron/dist
 const installerFiles = fs.readdirSync(electronDistPath).filter(file => 
-  file.toLowerCase().endsWith('.exe') && /t[- ]?sync/i.test(file)
+  file.toLowerCase().endsWith('.exe') && (/aurora|t[- ]?sync/i.test(file))
 );
 
 if (installerFiles.length === 0) {
-  console.error('❌ No Atlass Rise installer found in electron/dist/');
+  console.error('❌ No Aurora Rise or T-Sync installer found in electron/dist/');
+  console.log('Looking for .exe files containing "aurora" or "t-sync"');
   console.log('Available files:', fs.readdirSync(electronDistPath));
   process.exit(1);
 }
@@ -31,7 +32,7 @@ if (installerFiles.length === 0) {
 // Prefer NSIS installer that contains "Setup" in name
 const installerFile = installerFiles.find(f => /setup/i.test(f)) || installerFiles[0];
 const sourcePath = path.join(electronDistPath, installerFile);
-const targetPath = path.join(downloadsPath, 'Atlass-Rise-Platform-Setup.exe');
+const targetPath = path.join(downloadsPath, 'Aurora-Rise-Platform-Setup.exe');
 
 try {
   // Копируем установщик
@@ -45,13 +46,13 @@ try {
   console.log(`📁 Source: ${sourcePath}`);
   console.log(`📁 Target: ${targetPath}`);
   console.log(`📊 Size: ${fileSizeInMB} MB`);
-  console.log(`🌐 Available at: /downloads/Atlass-Rise-Setup-1.0.0.exe`);
+  console.log(`🌐 Available at: /downloads/Aurora-Rise-Setup-1.0.0.exe`);
 
   // Записываем latest.json с текущей версией приложения для проверки обновлений на клиенте
   const electronPkg = require(path.join(__dirname, '..', 'electron', 'package.json'));
   const latestJson = {
     version: electronPkg.version,
-    name: 'Atlass-Rise Platform',
+    name: 'Aurora-Rise Platform',
     publishedAt: new Date().toISOString(),
     notes: 'New desktop build available.'
   };

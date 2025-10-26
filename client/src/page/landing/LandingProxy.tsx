@@ -1,10 +1,8 @@
 import React from "react";
-import { Landing } from "../../../../web/src";
-import { useTheme } from "@/context/theme-provider";
+import LandingPage from "@/components/LandingPage";
 
 export default function LandingProxy() {
-  const { theme, toggleTheme } = useTheme();
-  return <Landing theme={theme} onToggleTheme={toggleTheme} />;
+  return <LandingPage />;
 }
 
 

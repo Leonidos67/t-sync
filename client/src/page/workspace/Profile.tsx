@@ -1,19 +1,15 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/context/auth-provider";
 import LogoutDialog from "@/components/asidebar/logout-dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { updateProfilePictureMutationFn, setUsernameMutationFn, updateUserRoleMutationFn } from "@/lib/api";
-import { CopyIcon, Pencil, ChevronDown, ExternalLink, Info } from "lucide-react";
+import { CopyIcon, Pencil, ChevronDown, Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
-import WebsiteManager from "@/components/website/website-manager";
-import useWorkspaceId from "@/hooks/use-workspace-id";
-import { useGetWebsiteByUsername } from "@/hooks/api/use-website";
 
 const PROFILE_BASE_URL = window.location.origin + "/u/users/";
 
@@ -30,11 +26,7 @@ const Profile = () => {
   const [showInfoOpen, setShowInfoOpen] = useState(false);
   const [roleLoading, setRoleLoading] = useState(false);
   const [currentRole, setCurrentRole] = useState<"coach" | "athlete" | null>(user?.userRole ?? null);
-  const navigate = useNavigate();
-  const workspaceId = useWorkspaceId();
   // Hook запроса сайта должен вызываться до любого условного return
-  const websiteUsername = user?.username ?? "";
-  const { data: websiteData } = useGetWebsiteByUsername(websiteUsername);
 
   if (!user) return null;
 
@@ -114,56 +106,12 @@ const Profile = () => {
   };
 
   const profileUrl = `${PROFILE_BASE_URL}${username}`;
-  const localWebsiteData = (() => {
-    if (!username) return null;
-    try {
-      const websites = JSON.parse(localStorage.getItem("websites") || "{}");
-      return websites[username] || null;
-    } catch {
-      return null;
-    }
-  })();
-  const hasWebsite = Boolean(websiteData?.website || localWebsiteData);
 
   return (
     <main className="flex flex-1 flex-col py-4 md:pt-3">
       <div className="flex items-center justify-between mb-6 gap-4">
         <h2 className="text-2xl font-bold tracking-tight">Мои данные</h2>
         <div className="flex gap-2 items-center">
-          {username && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => window.open(profileUrl, '_blank')}
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span className="hidden sm:inline">Открыть публичный профиль</span>
-                <span className="sm:hidden">Профиль</span>
-              </Button>
-              {hasWebsite ? (
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={() => navigate(`/workspace/${workspaceId}/create-website`)}
-                  className="flex items-center gap-2"
-                >
-                  Перейти в управление сайтом
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate(`/workspace/${workspaceId}/create-website`)}
-                  className="flex items-center gap-2"
-                >
-                  <Pencil className="w-4 h-4" />
-                  Создать сайт
-                </Button>
-              )}
-            </>
-          )}
           {!username ? (
             <Button
               type="button"
@@ -279,7 +227,7 @@ const Profile = () => {
       </div>
       <div className="w-full">
         <div className="w-full border rounded-lg p-6 bg-card flex flex-col items-start text-left shadow-sm">
-          <div className="flex flex-row items-center gap-6 mb-4">
+          <div className="flex flex-row items-center gap-6">
             <div className="relative group">
               <Avatar className="w-24 h-24 cursor-pointer" onClick={handleAvatarClick}>
                 <AvatarImage src={user.profilePicture || ''} alt={user.name} />
@@ -355,9 +303,9 @@ const Profile = () => {
         
         {/* Секция управления сайтом удалена по запросу */}
         
-        <Button variant="default" className="mt-6" onClick={() => setIsLogoutOpen(true)}>
+        {/* <Button variant="default" className="mt-6" onClick={() => setIsLogoutOpen(true)}>
           Выйти из аккаунта
-        </Button>
+        </Button> */}
         <LogoutDialog isOpen={isLogoutOpen} setIsOpen={setIsLogoutOpen} />
       </div>
     </main>

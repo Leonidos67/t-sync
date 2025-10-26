@@ -9,7 +9,7 @@ const UserGuide = () => {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Руководство пользователя</h1>
         <p className="text-muted-foreground">
-          Изучите возможности Atlass Rise и научитесь эффективно использовать платформу
+          Изучите возможности Aurora Rise и научитесь эффективно использовать платформу
         </p>
       </div>
 
@@ -22,7 +22,7 @@ const UserGuide = () => {
               <Badge variant="default">Рекомендуется</Badge>
             </CardTitle>
             <CardDescription>
-              Основные шаги для начала работы с Atlass Rise
+              Основные шаги для начала работы с Aurora Rise
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -71,14 +71,14 @@ const UserGuide = () => {
               <span>Видеоуроки</span>
             </CardTitle>
             <CardDescription>
-              Обучающие видео по использованию Atlass Rise
+              Обучающие видео по использованию Aurora Rise
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3">
               <Button variant="outline" className="justify-start">
                 <Play className="mr-2 h-4 w-4" />
-                Основы работы с Atlass Rise
+                Основы работы с Aurora Rise
                 <ExternalLink className="ml-auto h-4 w-4" />
               </Button>
               <Button variant="outline" className="justify-start">

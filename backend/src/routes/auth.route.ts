@@ -7,6 +7,7 @@ import {
   logOutController,
   registerUserController,
   updateUserRoleController,
+  autoLoginController,
 } from "../controllers/auth.controller";
 import isAuthenticated from "../middlewares/isAuthenticated.middleware";
 
@@ -16,6 +17,7 @@ const authRoutes = Router();
 
 authRoutes.post("/register", registerUserController);
 authRoutes.post("/login", loginController);
+authRoutes.post("/auto-login", autoLoginController);
 authRoutes.post("/logout", logOutController);
 authRoutes.put("/role", isAuthenticated, updateUserRoleController);
 

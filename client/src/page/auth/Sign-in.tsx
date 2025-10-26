@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
 import GoogleOauthButton from "@/components/auth/google-oauth-button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { loginMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
@@ -30,6 +30,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnUrl = searchParams.get("returnUrl");
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: loginMutationFn,
@@ -58,10 +59,15 @@ const SignIn = () => {
     mutate(values, {
       onSuccess: (data) => {
         const user = data.user;
-        console.log(user);
+        console.log('✅ Login successful:', user);
+        
+        // Обновляем кеш аутентификации
+        queryClient.setQueryData(["authUser"], { user });
+        console.log('🔄 Updated auth cache with user data');
+        
         const decodedUrl = returnUrl ? decodeURIComponent(returnUrl) : null;
-        // Если есть returnUrl, используем его, иначе перенаправляем на Welcome
-        navigate(decodedUrl || `/workspace/welcome`);
+        // Если есть returnUrl, используем его, иначе перенаправляем на главную страницу
+        navigate(decodedUrl || `/`);
       },
       onError: (error) => {
         toast({
@@ -83,7 +89,7 @@ const SignIn = () => {
           className="flex items-center gap-2 self-center font-medium"
         >
           <Logo url={null} />
-          Atlass Rise.
+          Aurora Rise.
         </a>
         <div className="flex flex-col gap-6">
           <Card>

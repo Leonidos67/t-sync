@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo    Atlass Rise Desktop Installer Builder
+echo    Aurora Rise Desktop Installer Builder
 echo ========================================
 echo.
 
@@ -59,9 +59,9 @@ echo    BUILD COMPLETED SUCCESSFULLY!
 echo ========================================
 echo.
 echo Your installer is ready at:
-echo   electron\dist\Atlass Rise Setup 1.0.0.exe
-echo   client\public\downloads\Atlass-Rise-Setup-1.0.0.exe
+echo   electron\dist\Aurora Rise Setup 1.0.0.exe
+echo   client\public\downloads\Aurora-Rise-Setup-1.0.0.exe
 echo.
-echo Users can download it from: /downloads/Atlass-Rise-Setup-1.0.0.exe
+echo Users can download it from: /downloads/Aurora-Rise-Setup-1.0.0.exe
 echo.
 pause

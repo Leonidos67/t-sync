@@ -264,7 +264,7 @@ const Header = () => {
                             }}
                           >
                             <Plus className="h-4 w-4" />
-                            <span>Создать новую Рабочую Зону</span>
+                            <span>Создать нового участника</span>
                           </Button>
                           <Button
                             variant="ghost"
@@ -275,7 +275,7 @@ const Header = () => {
                             }}
                           >
                             <Plus className="h-4 w-4" />
-                            <span>Создать новую Комнату</span>
+                            <span>Создать новую комнату</span>
                           </Button>
                           <Button
                             variant="ghost"
@@ -377,7 +377,7 @@ const Header = () => {
                           }}
                         >
                           <Plus className="h-4 w-4" />
-                          <span>Создать новую Рабочую Зону</span>
+                          <span>Создать нового участника</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -388,7 +388,7 @@ const Header = () => {
                           }}
                         >
                           <Plus className="h-4 w-4" />
-                          <span>Создать новую Комнату</span>
+                          <span>Создать новую комнату</span>
                         </Button>
                         <Button
                           variant="ghost"

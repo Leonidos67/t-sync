@@ -53,7 +53,7 @@ const Asidebar = () => {
                   to={`/workspace/${workspaceId}/home`}
                   className=" md:flex ml-2 items-center gap-2 self-center font-medium text-sidebar-foreground"
                 >
-                  Atlass Rise
+                  Aurora Rise Platform
                 </Link>
               )}
             </div>

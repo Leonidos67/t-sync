@@ -1,8 +1,8 @@
 {
-  "name": "atlass-rise-desktop",
+  "name": "Aurora-rise-desktop",
   "version": "1.0.0",
-  "description": "Atlass Rise Desktop Application",
-  "author": "Atlass Team",
+  "description": "Aurora Rise Desktop Application",
+  "author": "Aurora Team",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -15,8 +15,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "com.atlass.rise.desktop",
-    "productName": "Atlass Rise",
+    "appId": "com.Aurora.rise.desktop",
+    "productName": "Aurora Rise",
     "directories": {
       "output": "dist"
     },
@@ -51,7 +51,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Atlass Rise"
+      "shortcutName": "Aurora Rise"
     }
   },
   "devDependencies": {

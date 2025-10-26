@@ -65,8 +65,8 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Atlass ID</span>
-                    <span className="text-xs text-muted-foreground truncate">Единый профиль экосистемы Atlass и настройки аккаунта</span>
+                    <span className="text-sm font-medium text-foreground truncate">Aurora ID</span>
+                    <span className="text-xs text-muted-foreground truncate">Единый профиль экосистемы Aurora и настройки аккаунта</span>
                   </div>
                   <div className="flex-shrink-0">
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
@@ -86,7 +86,7 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Atlass Rise</span>
+                    <span className="text-sm font-medium text-foreground truncate">Aurora Rise</span>
                     <span className="text-xs text-muted-foreground truncate">Управление проектами, задачами и командой</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -110,7 +110,7 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Atlass Volt</span>
+                    <span className="text-sm font-medium text-foreground truncate">Aurora Volt</span>
                     <span className="text-xs text-muted-foreground truncate">Социальная сеть для спортсменов и тренеров</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -120,7 +120,7 @@ const ServicesMenu = () => {
               </Button>
 
               <Button variant="ghost" className="w-full justify-start h-auto py-2 px-3" asChild>
-                <Link to="/creatium" target="_blank" onClick={() => setOpen(false)} className="flex items-center gap-3 w-full min-w-0">
+                <Link to="/pragma" target="_blank" onClick={() => setOpen(false)} className="flex items-center gap-3 w-full min-w-0">
                   <div className="flex-shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="32" height="32">
                       <circle cx="60" cy="60" r="54" fill="#0b2b3a"/>
@@ -129,7 +129,7 @@ const ServicesMenu = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Pragma Atlass</span>
+                    <span className="text-sm font-medium text-foreground truncate">Pragma Aurora</span>
                     <span className="text-xs text-muted-foreground truncate">Создание персональных сайтов и портфолио</span>
                   </div>
                   <div className="flex-shrink-0">

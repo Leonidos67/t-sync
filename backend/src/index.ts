@@ -83,6 +83,9 @@ app.use(
   })
 );
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Root route is handled by SPA static handler in production; avoid throwing here
 
 app.use(`${BASE_PATH}/auth`, authRoutes);

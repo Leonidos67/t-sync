@@ -1,13 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Loader, Globe } from "lucide-react";
-import SocialHeader, { SocialSidebarMenu } from "@/components/social-header";
+import { Loader, Globe, ArrowUp, Search } from "lucide-react";
+import SocialContainer from "@/components/SocialContainer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import useAuth from "@/hooks/api/use-auth";
+import { getFollowingQueryFn, followUserMutationFn, unfollowUserMutationFn, searchUsersQueryFn, getAllPublicUsersQueryFn } from "@/lib/api";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface User {
   username: string;
   name: string;
   profilePicture: string | null;
+}
+
+interface FollowingUser {
+  username: string;
+  name: string;
+  profilePicture: string | null;
+  userRole?: "coach" | "athlete" | null;
 }
 
 const checkUserWebsite = (username: string): boolean => {
@@ -23,82 +36,211 @@ const UsersListPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [following, setFollowing] = useState<FollowingUser[]>([]);
+  const [followLoading, setFollowLoading] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const { data: currentUser } = useAuth();
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/user/all")
-      .then((res) => res.json())
+    getAllPublicUsersQueryFn()
       .then((data) => {
         setUsers(data.users || []);
         setError(null);
       })
-      .catch(() => setError("Ошибка загрузки пользователей"))
+      .catch(() => {
+        // Fallback для неавторизованных пользователей
+        fetch("/api/user/public/all")
+          .then((res) => res.json())
+          .then((data) => {
+            setUsers(data.users || []);
+            setError(null);
+          })
+          .catch(() => setError("Ошибка загрузки пользователей"));
+      })
       .finally(() => setLoading(false));
   }, []);
 
+  // Загрузка подписок
+  useEffect(() => {
+    if (currentUser?.user?.username) {
+      getFollowingQueryFn(currentUser.user.username)
+        .then((data) => {
+          console.log('Following data:', data);
+          setFollowing(data.following || []);
+        })
+        .catch((error) => {
+          console.error('Error loading following:', error);
+          setFollowing([]);
+        });
+    }
+  }, [currentUser]);
+
+  const handleFollow = async (username: string) => {
+    setFollowLoading(username);
+    try {
+      await followUserMutationFn(username);
+      setFollowing(f => [...f, { username, name: '', profilePicture: null }]);
+    } finally {
+      setFollowLoading(null);
+    }
+  };
+
+  const handleUnfollow = async (username: string) => {
+    setFollowLoading(username);
+    try {
+      await unfollowUserMutationFn(username);
+      setFollowing(f => f.filter(u => u.username !== username));
+    } finally {
+      setFollowLoading(null);
+    }
+  };
+
+  // Функция поиска пользователей
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const data = await searchUsersQueryFn(query);
+      setSearchResults(data.users || []);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounced поиск
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim()) {
+      searchTimeoutRef.current = setTimeout(() => {
+        handleSearch(searchQuery);
+      }, 300);
+    } else {
+      setSearchResults([]);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, handleSearch]);
+
+  // Отслеживание скролла для показа кнопки "Вернуться наверх"
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollButton(scrollTop > 300); // Показываем кнопку после прокрутки на 300px
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <>
-      <SocialHeader />
-      <div className="tsygram-dark flex min-h-svh bg-background">
-        {/* Левая колонка */}
-        <SocialSidebarMenu />
-        {/* Центр: список пользователей */}
-        <main className="flex-1 flex flex-col items-center px-2 sm:px-4 py-4 sm:py-8">
-          <div className="w-full max-w-2xl flex flex-col gap-4 sm:gap-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-center">Пользователи</h1>
-            {loading ? (
-              <div className="flex justify-center items-center h-24 sm:h-32"><Loader className="animate-spin w-6 h-6 sm:w-8 sm:h-8" /></div>
-            ) : error ? (
-              <div className="text-center text-red-500 mt-6 sm:mt-10 text-sm sm:text-base">{error}</div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {users.map((user) => (
-                  <Link key={user.username} to={`/u/users/${user.username}`} className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded shadow hover:bg-gray-50">
-                    <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
+    <SocialContainer>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl sm:text-3xl font-bold">Пользователи</h1>
+      </div>
+      <div className="relative">
+        <div className="bg-secondary rounded-full px-4 h-12 flex items-center hover:bg-secondary/80 transition-colors">
+          <Search className="w-4 h-4 text-muted-foreground mr-3" />
+          <Input
+            type="text"
+            placeholder="Найди друга"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-transparent border-0 h-full py-0 focus-visible:ring-0 focus:ring-0 outline-none placeholder:text-muted-foreground text-sm"
+          />
+          {isSearching && (
+            <Loader className="w-4 h-4 animate-spin text-muted-foreground ml-2" />
+          )}
+        </div>
+      </div>
+      {loading ? (
+        <div className="flex justify-center items-center h-32">
+          <Loader className="animate-spin w-8 h-8 text-muted-foreground" />
+        </div>
+      ) : error ? (
+        <div className="text-center text-destructive mt-6 sm:mt-10 text-sm sm:text-base">{error}</div>
+      ) : (searchQuery.trim() ? searchResults : users).length === 0 ? (
+        <div className="text-center text-muted-foreground">
+          {searchQuery.trim() ? `По запросу "${searchQuery}" пользователи не найдены` : "Пользователи не найдены"}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 sm:gap-4">
+          {(searchQuery.trim() ? searchResults : users)
+            .filter(user => user.username !== currentUser?.user?.username)
+            .map((user) => (
+            <div key={user.username} className="p-3 sm:p-4 border border-border rounded-3xl bg-card">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-3 flex-1">
+                  <Link to={`/u/users/${user.username}`} className="flex items-center gap-1.5 sm:gap-2 hover:underline flex-1">
+                    <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
                       <AvatarImage src={user.profilePicture || ''} alt={user.name} />
                       <AvatarFallback className="text-sm">{user.name?.[0]}</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <div className="font-semibold text-sm sm:text-base">{user.name}</div>
-                      <div className="text-blue-600 font-mono text-xs sm:text-sm">@{user.username}</div>
-                    </div>
-                    {checkUserWebsite(user.username) && (
-                      <Globe className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    )}
+                    <span className="font-semibold flex items-center gap-1 text-sm sm:text-base">
+                      {user.name}
+                    </span>
                   </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </main>
-        {/* Правая колонка */}
-        <aside className="hidden lg:flex flex-col w-64 border-l bg-white p-4 sm:p-6 gap-4 sm:gap-6 min-h-svh sticky top-0">
-          <div>
-            <div className="font-semibold text-base sm:text-lg mb-2">Все пользователи</div>
-            <div className="grid grid-cols-3 gap-2">
-              {users.map((user) => (
-                <Link
-                  key={user.username}
-                  to={`/u/users/${user.username}`}
-                  className="flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-50 transition-colors relative"
-                >
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={user.profilePicture || ''} alt={user.name} />
-                    <AvatarFallback className="text-xs">{user.name?.[0]}</AvatarFallback>
-                  </Avatar>
                   {checkUserWebsite(user.username) && (
-                    <Globe className="w-3 h-3 text-blue-600 absolute -top-1 -right-1" />
+                    <Globe className="w-4 h-4 text-accent flex-shrink-0" />
                   )}
-                  <span className="font-semibold text-xs truncate max-w-[60px] text-center">{user.name}</span>
-                  <span className="text-gray-500 text-[10px] font-mono truncate max-w-[60px] text-center">@{user.username}</span>
-                </Link>
-              ))}
+                </div>
+                {currentUser?.user && currentUser.user.username !== user.username && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs sm:text-sm ml-4"
+                    onClick={() => {
+                      const isFollowing = following.some(f => f.username === user.username);
+                      if (isFollowing) {
+                        handleUnfollow(user.username);
+                      } else {
+                        handleFollow(user.username);
+                      }
+                    }}
+                    disabled={followLoading === user.username}
+                  >
+                    {followLoading === user.username ? (
+                      <Loader className="w-3 h-3 animate-spin" />
+                    ) : following.some(f => f.username === user.username) ? (
+                      "Отписаться"
+                    ) : (
+                      "Подписаться"
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        </aside>
-      </div>
-    </>
+          ))}
+        </div>
+      )}
+      {showScrollButton && (
+        <Button 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-24 md:bottom-2 left-1/2 transform -translate-x-1/2 z-50 rounded-full px-8 py-3 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
+    </SocialContainer>
   );
 };
 
-export default UsersListPage; 
+export default UsersListPage;

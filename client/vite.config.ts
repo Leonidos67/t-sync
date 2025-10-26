@@ -12,8 +12,7 @@ export default defineConfig({
   },
   server: {
     fs: {
-      // allow importing TS/TSX from sibling web/ folder
-      allow: [path.resolve(__dirname, ".."), path.resolve(__dirname, "../web")],
+      allow: [path.resolve(__dirname, "..")],
     },
     proxy: {
       "/api": {

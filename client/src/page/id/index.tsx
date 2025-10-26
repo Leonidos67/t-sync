@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,9 @@ const IdPage = () => {
   const { theme, setTheme } = useTheme();
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
+  const { workspaceId } = useParams();
+
+  console.log('🆔 IdPage - isLoading:', isLoading, 'user:', user, 'workspaceId:', workspaceId);
   const [isServicesModalOpen, setIsServicesModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
@@ -376,6 +379,7 @@ const IdPage = () => {
   }, []);
 
   if (isLoading) {
+    console.log('🆔 IdPage - Loading, showing spinner');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -384,9 +388,12 @@ const IdPage = () => {
   }
 
   if (!user) {
+    console.log('🆔 IdPage - No user, redirecting to /');
     navigate("/");
     return null;
   }
+
+  console.log('🆔 IdPage - Rendering page content');
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -590,7 +597,7 @@ const IdPage = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">На Atlass с:</span>
+                    <span className="text-muted-foreground">На Aurora с:</span>
                     <span className="font-medium text-foreground">{format(new Date(user.createdAt), 'MMMM yyyy', { locale: ru })}</span>
                   </div>
                 </div>
@@ -739,7 +746,7 @@ const IdPage = () => {
                       <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted cursor-not-allowed opacity-50">
                         <div>
                           <span className="text-foreground font-medium">Единый профиль</span>
-                          <p className="text-muted-foreground text-sm mt-1">Ваш профиль синхронизирован между всеми сервисами Atlass</p>
+                          <p className="text-muted-foreground text-sm mt-1">Ваш профиль синхронизирован между всеми сервисами Aurora</p>
                         </div>
                         <Switch
                           checked={true}
@@ -1307,14 +1314,14 @@ const IdPage = () => {
               <span className="font-medium text-sm text-foreground">Наши сервисы</span>
             </div>
             <div className="space-y-1">
-              {/* Atlass ID */}
+              {/* Aurora ID */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
                 asChild
               >
                 <Link 
-                  to="/id/"
+                  to={workspaceId ? `/workspace/${workspaceId}/id/` : "/id/"}
                   onClick={() => setIsServicesModalOpen(false)}
                   className="flex items-center gap-3 w-full min-w-0"
                 >
@@ -1344,7 +1351,7 @@ const IdPage = () => {
                   </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Atlass ID</span>
+                    <span className="text-sm font-medium text-foreground truncate">Aurora ID</span>
                     <span className="text-xs text-muted-foreground truncate">Единый профиль и настройки аккаунта</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1353,7 +1360,7 @@ const IdPage = () => {
                 </Link>
               </Button>
   
-              {/* Atlass Rise */}
+              {/* Aurora Rise */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1376,7 +1383,7 @@ const IdPage = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Atlass Rise</span>
+                    <span className="text-sm font-medium text-foreground truncate">Aurora Rise</span>
                     <span className="text-xs text-muted-foreground truncate">Управление проектами, задачами и командой</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1385,7 +1392,7 @@ const IdPage = () => {
                 </Link>
               </Button>
   
-              {/* Atlass Volt */}
+              {/* Aurora Volt */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1410,7 +1417,7 @@ const IdPage = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Atlass Volt</span>
+                    <span className="text-sm font-medium text-foreground truncate">Aurora Volt</span>
                     <span className="text-xs text-muted-foreground truncate">Социальная сеть для спортсменов и тренеров</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1419,7 +1426,7 @@ const IdPage = () => {
                 </Link>
               </Button>
   
-              {/* Pragma Atlass */}
+              {/* Pragma Aurora */}
               <Button 
                 variant="ghost" 
                 className="w-full justify-start h-auto py-2 px-3"
@@ -1427,7 +1434,7 @@ const IdPage = () => {
               >
                 <Link 
                   target="_blank"
-                  to="/creatium" 
+                  to="/pragma" 
                   onClick={() => setIsServicesModalOpen(false)}
                   className="flex items-center gap-3 w-full min-w-0"
                 >
@@ -1441,7 +1448,7 @@ const IdPage = () => {
                     </svg>
                   </div>
                   <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                    <span className="text-sm font-medium text-foreground truncate">Pragma Atlass</span>
+                    <span className="text-sm font-medium text-foreground truncate">Pragma Aurora</span>
                     <span className="text-xs text-muted-foreground truncate">Создание персональных сайтов и портфолио</span>
                   </div>
                   <div className="flex-shrink-0">
@@ -1463,8 +1470,8 @@ const IdPage = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <IdLogo url="/id" />
-              <a href="/id/" className="text-xl font-semibold text-foreground">Atlass ID</a>
+              <IdLogo url={workspaceId ? `/workspace/${workspaceId}/id` : "/id"} />
+              <a href={workspaceId ? `/workspace/${workspaceId}/id/` : "/id/"} className="text-xl font-semibold text-foreground">Aurora ID</a>
               <ServicesModal />
             </div>
             <div className="flex items-center space-x-3">

@@ -13,7 +13,7 @@ import BottomSheet from "@/components/ui/bottom-sheet";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 
-const CreatiumCreate: React.FC = () => {
+const pragmaCreate: React.FC = () => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { data: currentUser } = useAuth();
@@ -438,10 +438,10 @@ const CreatiumCreate: React.FC = () => {
         <div className="flex min-h-screen">
           {/* Sidebar */}
           <aside className="w-64 shrink-0 bg-card/50 p-3 flex flex-col">
-            <div className="text-base font-semibold mb-3">Pragma Atlass</div>
+            <div className="text-base font-semibold mb-3">Pragma Aurora</div>
             <nav className="flex flex-col gap-1">
-              <Link to="/creatium" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Главная</Link>
-              <Link to="/creatium/create" className="px-2 py-1 rounded bg-accent text-accent-foreground">Мои сайты</Link>
+              <Link to="/pragma" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Главная</Link>
+              <Link to="/pragma/create" className="px-2 py-1 rounded bg-accent text-accent-foreground">Мои сайты</Link>
               <Link to="#" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Просмотр</Link>
             </nav>
             {/* Guide section removed on Create page to avoid duplication */}
@@ -854,4 +854,4 @@ const CreatiumCreate: React.FC = () => {
   );
 };
 
-export default CreatiumCreate;
+export default pragmaCreate;

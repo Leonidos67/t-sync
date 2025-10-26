@@ -16,8 +16,10 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
     const promptRaw = (req.body && (req.body as any).prompt) as unknown;
     const prompt = typeof promptRaw === "string" ? promptRaw : "";
 
-         const userId = req.user?._id?.toString();
-     let workspaceId = req.user?.currentWorkspace?.toString();
+    const userId = req.user?._id?.toString();
+    // Prefer explicit workspaceId from body if user is a member of it
+    const bodyWorkspaceId = (req.body && (req.body as any).workspaceId) as string | undefined;
+    let workspaceId = req.user?.currentWorkspace?.toString();
      let userMemberships: any[] = [];
 
      // Если нет текущей зоны или нужно определить актуальную зону
@@ -173,13 +175,31 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
         `Active count: ${activeCount}; Completed count: ${completedCount}\n` +
         (projectsWithUserTasks.length ? `Shared rooms: ${projectsWithUserTasks.map(p => `${p.emoji || ''} ${p.name}`).join('; ')}` : ``) +
         (members.length ? `\nMembers: ${members.slice(0, 10).map(m => `${m.name || '—'}${m.userRole ? `(${m.userRole})` : ''}`).join('; ')}` : ``);
+
+      // Если запрос пустой или это явный запрос на обзор — вернем инициализационный ответ
+      const initRequested = !prompt || /\b(инициализац|обзор|summary|init)\b/i.test(String(prompt));
+      if (initRequested) {
+        const wsName = (workspace as any)?.name || workspaceId;
+        const rooms = projects.map((p: any) => ({ _id: String(p._id), name: p.name, emoji: p.emoji }));
+        const answer = `Рабочая область: ${wsName}. Комнат: ${rooms.length}. Выберите комнату, чтобы посмотреть тренировки.`;
+        res.status(200).json({ answer, rooms });
+        return;
+      }
     }
 
          const lowerPrompt = (prompt || "").toLowerCase();
      const asksWho = lowerPrompt.includes("кто ты") || lowerPrompt.includes("кто тебя разработал") || lowerPrompt.includes("кем ты был разработан") || lowerPrompt.includes("кто разработал") || lowerPrompt.includes("who are you") || lowerPrompt.includes("who developed") || lowerPrompt.includes("who built you");
-     const introduceLine = asksWho ? "Меня разработала команда Atlass." : "";
+     const introduceLine = asksWho ? "Меня разработала команда Aurora." : "";
 
-     // Проверяем, не указал ли пользователь конкретную зону в запросе
+    // Проверяем, не указал ли пользователь конкретную зону явно через body
+    if (bodyWorkspaceId && userId) {
+      const membership = await MemberModel.findOne({ userId, workspaceId: bodyWorkspaceId }).lean();
+      if (membership) {
+        workspaceId = bodyWorkspaceId;
+      }
+    }
+
+    // Проверяем, не указал ли пользователь конкретную зону в запросе
      const workspaceMatch = (prompt || '').match(/зона[:\s]+([^\s]+)/i) || (prompt || '').match(/workspace[:\s]+([^\s]+)/i);
      if (workspaceMatch && userId) {
        const workspaceName = workspaceMatch[1].toLowerCase();
@@ -228,7 +248,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
     }
 
     const systemInstruction = `Ты — ассистент навигации по приложению тренера/спортсмена женского пола. Отвечай кратко и по делу на русском.
-Если пользователь спрашивает кто ты/кто разработал — обязательно ответь: \'Я — ассистент Atlass.\'.
+Если пользователь спрашивает кто ты/кто разработал — обязательно ответь: \'Я — ассистент Aurora.\'.
 Можешь подсказывать маршруты (например /workspace/:id/tasks), но не добавляй query-параметры (например ?project=).
 Если спрашивают про конкретную комнату (проект) или тренировку, добавь прямую ссылку на комнату: /workspace/:workspaceId/project/:projectId.
 Избегай навязчивых рекомендаций вроде \'Рекомендую проверить просроченные тренировки\'. Если нет данных, скажи, что данных нет.`;
@@ -245,11 +265,12 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
       if (lower.includes("комнат") || lower.includes("проект")) {
         let answer = "";
         if (projects && projects.length > 0) {
-          // Краткое сообщение о количестве комнат
-          answer = `В вашей зоне я нашел ${projects.length} комнат(у). Выберите комнату(ы), чтобы ознакомиться с тренировками.`;
+          // Краткое сообщение о количестве комнат в активной зоне
+          const visibleProjects = projects;
+          answer = `В вашей зоне я нашел ${visibleProjects.length} комнат(у). Выберите комнату(ы), чтобы ознакомиться с тренировками.`;
           
           // Возвращаем комнаты для отображения кнопок
-          const rooms = projects.map((p: any) => ({
+          const rooms = visibleProjects.map((p: any) => ({
             _id: String(p._id),
             name: p.name,
             emoji: p.emoji,
@@ -258,7 +279,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
           res.status(200).json({ answer, rooms });
           return;
         } else {
-          answer = "У вас пока нет комнат. Создайте первую комнату для организации тренировок.";
+          answer = "У вас пока нет комнат. Создайте свою первую комнату 👉 \n[создать](/workspace/create-room)";
         }
         if (entityLinks.length > 0) {
           answer += `\n\nПрямые ссылки: ${entityLinks.join(" | ")}`;
@@ -495,7 +516,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
       }
     }
 
-         if (!config.GEMINI_API_KEY) {
+        if (!config.GEMINI_API_KEY) {
       // Без ключа: умные ответы на основе контекста
       const lower = (prompt || "").toLowerCase();
       let fallbackAnswer = "";
@@ -505,13 +526,11 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
       // Конкретные ответы на основе вопроса
                  if (lower.includes("комнат") || lower.includes("проект")) {
             if (projects && projects.length > 0) {
-              fallbackAnswer = `В вашей зоне ${projects.length} комнат`;
-              if (askMyRooms && projectsWithUserTasks && projectsWithUserTasks.length > 0) {
-                fallbackAnswer += `\n\nУ вас ${projectsWithUserTasks.length} комнат с вашими тренировками`;
-              }
+              const visibleProjects = projects; // всегда комнаты активной зоны
+              fallbackAnswer = `В вашей зоне ${visibleProjects.length} комнат`;
               
               // Возвращаем комнаты для отображения кнопок
-              const rooms = projects.map((p: any) => ({
+              const rooms = visibleProjects.map((p: any) => ({
                 _id: String(p._id),
                 name: p.name,
                 emoji: p.emoji,
@@ -630,7 +649,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
             fallbackAnswer = `Выполненные тренировки: ${completedCount}\n\nСсылка: /workspace/${workspaceId}/completed`;
           }
         } else if (lower.includes("привет") || lower.includes("hello")) {
-         fallbackAnswer = `Привет! Я помогу вам с навигацией по сервисам Atlass. Задайте мне любой вопрос!`;
+         fallbackAnswer = `Привет! Я помогу вам с навигацией по сервисам Aurora. Задайте мне любой вопрос!`;
        } else {
          // Общий ответ с кратким контекстом
          fallbackAnswer = `В вашей зоне ${projects?.length || 0} комнат и ${members?.length || 0} участников.`;
@@ -792,7 +811,7 @@ aiRoutes.post("/query", isAuthenticated, async (req: Request, res: Response) => 
               errorFallbackAnswer = `Выполненные тренировки: ${completedCount}\n\nСсылка: /workspace/${workspaceId}/completed`;
             }
           } else if (lower.includes("привет") || lower.includes("hello")) {
-            errorFallbackAnswer = `Привет! Я помогу вам с навигацией по всем сервисам Atlass. Задайте мне любой вопрос!`;
+            errorFallbackAnswer = `Привет! Я помогу вам с любым вопросом, касаемо сервиса Aurora Rise Platfrom!`;
           } else {
             // Общий ответ с кратким контекстом
             errorFallbackAnswer = `В вашей зоне ${projects?.length || 0} комнат и ${members?.length || 0} участников.`;

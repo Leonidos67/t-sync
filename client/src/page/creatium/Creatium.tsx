@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronUp, Plus } from "lucide-react";
 import CardSwap from "@/components/ui/CardSwap";
 
-const Creatium: React.FC = () => {
+const pragma: React.FC = () => {
   const navigate = useNavigate();
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [completedSteps] = useState(0);
@@ -15,10 +15,10 @@ const Creatium: React.FC = () => {
         <div className="flex h-full">
           {/* Sidebar */}
           <aside className="w-64 shrink-0 bg-card/50 p-3 flex flex-col">
-            <div className="text-base font-semibold mb-3">Pragma Atlass</div>
+            <div className="text-base font-semibold mb-3">Pragma Aurora</div>
             <nav className="flex flex-col gap-1">
-              <Link to="/creatium" className="px-2 py-1 rounded bg-accent text-accent-foreground">Главная</Link>
-              <Link to="/creatium/create" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Мои сайты</Link>
+              <Link to="/pragma" className="px-2 py-1 rounded bg-accent text-accent-foreground">Главная</Link>
+              <Link to="/pragma/create" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Мои сайты</Link>
               <Link to="#" className="px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground transition-colors">Аналитика</Link>
             </nav>
             {/* Guide section at bottom */}
@@ -64,7 +64,7 @@ const Creatium: React.FC = () => {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-4">Создайте свой персональный сайт</h2>
                   <p className="text-muted-foreground mb-4">
-                    Pragma Atlass позволяет легко создать профессиональный персональный сайт. 
+                    Pragma Aurora позволяет легко создать профессиональный персональный сайт. 
                     Покажите свои достижения, навыки и работы в красивом и современном формате.
                   </p>
                   <div className="space-y-2 text-sm text-muted-foreground">
@@ -137,7 +137,7 @@ const Creatium: React.FC = () => {
                       }}
                     />
                   </div>
-                  <Button className="mt-4" onClick={() => navigate('/creatium/create')}>
+                  <Button className="mt-4" onClick={() => navigate('/pragma/create')}>
                     <Plus className="h-4 w-4" />
                     Создать сайт
                   </Button>
@@ -152,4 +152,4 @@ const Creatium: React.FC = () => {
   );
 };
 
-export default Creatium;
+export default pragma;

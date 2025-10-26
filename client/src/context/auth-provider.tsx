@@ -38,6 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   } = useAuth();
   const user = authData?.user;
 
+  console.log('🔄 AuthProvider - Auth data:', { authData, user, isLoading, isFetching, authError });
+
   const {
     data: workspaceData,
     isLoading: workspaceLoading,
@@ -47,9 +49,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const workspace = workspaceData?.workspace;
 
+  // Ensure we fetch current user session on app start so redirects work after OAuth/login
   useEffect(() => {
+    console.log('🔄 AuthProvider - Refetching auth on mount');
+    refetchAuth().then((result) => {
+      console.log('🔄 AuthProvider - Refetch result:', result);
+    }).catch((error) => {
+      console.error('🔄 AuthProvider - Refetch error:', error);
+    });
+  }, [refetchAuth]);
+
+  useEffect(() => {
+    console.log('🔄 AuthProvider - Workspace error:', workspaceError);
     if (workspaceError) {
       if (workspaceError?.errorCode === "ACCESS_UNAUTHORIZED") {
+        console.log('🔄 AuthProvider - Access unauthorized, redirecting to /workspace/welcome');
         navigate("/workspace/welcome"); // Redirect to Welcome if the user is not a member of the workspace
       }
     }

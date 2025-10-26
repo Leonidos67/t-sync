@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🚀 Starting Atlass Rise Desktop build process...\n');
+console.log('🚀 Starting Aurora Rise Desktop build process...\n');
 
 // Check if we're in the right directory
 if (!fs.existsSync('package.json')) {

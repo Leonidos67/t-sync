@@ -55,8 +55,8 @@ export const loginController = asyncHandler(
 
     // Генерируем JWT токен
     const token = generateToken({
-      userId: user._id.toString(),
-      email: user.email,
+      userId: String(user._id),
+      email: user.email || email,
     });
 
     console.log("✅ Login successful, JWT token generated:", {
@@ -151,8 +151,8 @@ export const autoLoginController = asyncHandler(
 
     // Генерируем JWT токен
     const token = generateToken({
-      userId: user._id.toString(),
-      email: user.email,
+      userId: String(user._id),
+      email: user.email || '',
     });
 
     console.log('JWT token generated successfully for:', user.email);

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import useCreateProjectDialog from "@/hooks/use-create-project-dialog";
 import BottomSheet from "@/components/ui/bottom-sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
- 
+import API from "@/lib/axios-client";
 
 type RoomOption = { _id: string; name: string; emoji?: string };
 type ChatMessage = {
@@ -24,8 +24,6 @@ type ChatMessage = {
   disliked?: boolean;
   originalPrompt?: string;
 };
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL as string | undefined;
 
 export default function AiAssistant() {
   const { state: sidebarState } = useSidebar();
@@ -228,13 +226,6 @@ export default function AiAssistant() {
     };
   }, []);
 
-  const endpoint = useMemo(() => {
-    if (API_BASE) {
-      const trimmed = API_BASE.replace(/\/$/, "");
-      return `${trimmed}/v1/ai/query`;
-    }
-    return `/api/v1/ai/query`;
-  }, []);
 
   const ask = async (customMessage?: string) => {
     const trimmed = (customMessage ?? question).trim();
@@ -276,25 +267,13 @@ export default function AiAssistant() {
     if (!customMessage) setQuestion("");
 
     try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ 
-          prompt: promptWithAthletes,
-          workspaceId,
-          selectedAthletes: selectedAthletes.length > 0 ? selectedAthletes : undefined
-        }),
+      const response = await API.post("/ai/query", { 
+        prompt: promptWithAthletes,
+        workspaceId,
+        selectedAthletes: selectedAthletes.length > 0 ? selectedAthletes : undefined
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || `HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
+      const data = response.data;
       const answer = data?.answer || "";
       const rooms = Array.isArray(data?.rooms) ? (data.rooms as RoomOption[]) : undefined;
       setMessages((prev) => {

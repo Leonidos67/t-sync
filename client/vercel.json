@@ -1,12 +1,8 @@
 {
-  "routes": [
+  "rewrites": [
     {
-      "src": "/downloads/(.*)",
-      "dest": "/downloads/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!downloads/).*)",
+      "destination": "/index.html"
     }
   ]
 }

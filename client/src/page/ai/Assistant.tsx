@@ -267,7 +267,7 @@ export default function AiAssistant() {
     if (!customMessage) setQuestion("");
 
     try {
-      const response = await API.post("/ai/query", { 
+      const response = await API.post("/v1/ai/query", { 
         prompt: promptWithAthletes,
         workspaceId,
         selectedAthletes: selectedAthletes.length > 0 ? selectedAthletes : undefined

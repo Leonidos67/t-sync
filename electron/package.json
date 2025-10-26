@@ -8,6 +8,8 @@
     "start": "electron .",
     "build": "electron-builder",
     "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-all": "electron-builder --win --mac",
     "dist": "npm run build-frontend && npm run build-backend && electron-builder",
     "build-frontend": "cd ../client && npm run build:fast",
     "build-backend": "cd ../backend && npm run build",

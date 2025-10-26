@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { detectOS, getPlatformDownload } from "./lib/platform";
 
 declare global {
   interface Window {
@@ -23,6 +24,7 @@ declare global {
 
 function App() {
   const [showDesktopModal, setShowDesktopModal] = useState(false);
+  const [downloadButtonText, setDownloadButtonText] = useState('Скачать приложение');
   const isMobile = useIsMobile();
 
   const setRemindUntil = (date: Date) => {
@@ -33,6 +35,20 @@ function App() {
   };
 
   // Update modal is handled elsewhere now
+
+  // Detect OS and set button text
+  useEffect(() => {
+    const platform = detectOS();
+    if (platform === 'Windows') {
+      setDownloadButtonText('Скачать для Windows');
+    } else if (platform === 'macOS') {
+      setDownloadButtonText('Скачать для macOS');
+    } else if (platform === 'Linux') {
+      setDownloadButtonText('Скачать для Linux');
+    } else {
+      setDownloadButtonText('Скачать приложение');
+    }
+  }, []);
 
   // First-visit Desktop app modal (shown once per browser)
   useEffect(() => {
@@ -67,21 +83,31 @@ function App() {
   const handleDesktopDownload = async () => {
     try {
       const response = await fetch('/api/downloads/info');
-      const data = await response.json() as { success?: boolean; downloads?: Array<{ filename?: string; sizeFormatted?: string; downloadUrl: string }>; };
+      const data = await response.json() as { success?: boolean; downloads?: Array<{ filename?: string; platform?: string; sizeFormatted?: string; downloadUrl: string }>; };
       if (data?.success && Array.isArray(data.downloads) && data.downloads.length > 0) {
-        const installer = data.downloads.find((d) => d.filename?.toLowerCase().endsWith('.exe')) || data.downloads[0];
+        const download = getPlatformDownload(data.downloads);
+        
         const link = document.createElement('a');
-        link.href = installer.downloadUrl;
-        link.download = installer.filename || 'Aurora-Rise-Platform-Setup.exe';
+        link.href = download.downloadUrl;
+        link.download = download.filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        // fallback direct link if API unavailable
-        window.location.href = '/downloads/Aurora-Rise-Platform-Setup.exe';
+        // fallback direct link if API unavailable based on OS
+        const platform = detectOS();
+        const fallbackUrl = platform === 'macOS' 
+          ? '/downloads/Aurora-Rise-Platform.dmg' 
+          : '/downloads/Aurora-Rise-Platform-Setup.exe';
+        window.location.href = fallbackUrl;
       }
     } catch {
-      window.location.href = '/downloads/Aurora-Rise-Platform-Setup.exe';
+      // fallback based on OS
+      const platform = detectOS();
+      const fallbackUrl = platform === 'macOS' 
+        ? '/downloads/Aurora-Rise-Platform.dmg' 
+        : '/downloads/Aurora-Rise-Platform-Setup.exe';
+      window.location.href = fallbackUrl;
     }
   };
 
@@ -155,7 +181,7 @@ function App() {
             <div className="mt-4 flex flex-col sm:flex-row gap-2">
               <Button onClick={handleDesktopDownload} className="w-full sm:w-auto">
                 <Download className="w-4 h-4 mr-2" />
-                Скачать для Windows
+                {downloadButtonText}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

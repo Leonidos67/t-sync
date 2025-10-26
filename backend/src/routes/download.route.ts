@@ -18,12 +18,23 @@ router.get("/info", (req: Request, res: Response): void => {
     }
 
     const files = fs.readdirSync(downloadsPath);
-    const installerFiles = files.filter(file => file.toLowerCase().endsWith('.exe') || file.toLowerCase().endsWith('.zip'));
+    const installerFiles = files.filter(file => {
+      const lower = file.toLowerCase();
+      return lower.endsWith('.exe') || lower.endsWith('.dmg') || lower.endsWith('.zip') || lower.endsWith('.appimage');
+    });
     
     // Map files to descriptor objects
     const downloadInfo = installerFiles.map(file => {
       const filePath = path.join(downloadsPath, file);
       const stats = fs.statSync(filePath);
+      const lower = file.toLowerCase();
+      
+      // Determine platform
+      let platform = 'Unknown';
+      if (lower.endsWith('.exe')) platform = 'Windows';
+      else if (lower.endsWith('.dmg')) platform = 'macOS';
+      else if (lower.endsWith('.appimage')) platform = 'Linux';
+      else if (lower.endsWith('.zip')) platform = 'Archive';
       
       return {
         filename: file,
@@ -31,12 +42,20 @@ router.get("/info", (req: Request, res: Response): void => {
         sizeFormatted: formatFileSize(stats.size),
         lastModified: stats.mtime,
         downloadUrl: `/downloads/${file}`,
-        isExe: file.toLowerCase().endsWith('.exe')
+        platform,
+        isExe: lower.endsWith('.exe'),
+        isDmg: lower.endsWith('.dmg')
       };
     });
 
-    // Prefer .exe first
-    downloadInfo.sort((a, b) => (a.isExe === b.isExe ? 0 : a.isExe ? -1 : 1));
+    // Sort: Windows first, then macOS, then others
+    downloadInfo.sort((a, b) => {
+      if (a.isExe && !b.isExe) return -1;
+      if (!a.isExe && b.isExe) return 1;
+      if (a.isDmg && !b.isDmg) return -1;
+      if (!a.isDmg && b.isDmg) return 1;
+      return 0;
+    });
 
     res.json({
       success: true,

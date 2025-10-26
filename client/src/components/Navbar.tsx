@@ -4,16 +4,7 @@ import { Menu, X, Sparkles, Sun, Moon, ArrowUpRight, ChevronDown } from "lucide-
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/theme-provider";
 import voltLogo from "@/assets/logo/volt.png";
-
-const handleDownload = () => {
-  // Создаем ссылку для скачивания установщика
-  const link = document.createElement('a');
-  link.href = '/downloads/Aurora-Rise-Platform-Setup.exe';
-  link.download = 'Aurora-Rise-Platform-Setup.exe';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+import { DownloadDropdown } from "./download-dropdown";
 
 const navItems = [
   { name: "Тарифы", path: "/pricing" },
@@ -331,16 +322,11 @@ const Navbar = () => {
                       </div>
                     </div>
                     
-                    <Button 
+                    <DownloadDropdown 
                       size="lg" 
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-b-3xl rounded-t-none"
-                      onClick={handleDownload}
-                    >
-                      <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .15V5.21L20 3zM3 13l6 .09v6.81l-6-1.15V13zm17 .25V22l-10-1.91v-6.84l10 .15z"/>
-                      </svg>
-                      Скачать на Windows
-                    </Button>
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-b-3xl rounded-t-none w-full"
+                      buttonText="Скачать"
+                    />
                     
                   </div>
                 </div>

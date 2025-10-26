@@ -10,6 +10,7 @@ import NotionStyleBlock from "./NotionStyleBlock";
 import { AUTH_ROUTES } from "@/routes/common/routePaths";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/context/auth-provider";
+import { DownloadDropdown } from "./download-dropdown";
 
 interface LandingPageProps {
   theme?: string;
@@ -34,16 +35,6 @@ const LandingPage: React.FC<LandingPageProps> = () => {
 
   const closeModal = () => {
     setShowSuccessModal(false);
-  };
-
-  const handleDownload = () => {
-    // Создаем ссылку для скачивания установщика
-    const link = document.createElement('a');
-    link.href = '/downloads/Aurora-Rise-Platform-Setup.exe';
-    link.download = 'Aurora-Rise-Platform-Setup.exe';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const openTelegram = () => {
@@ -162,16 +153,11 @@ const LandingPage: React.FC<LandingPageProps> = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in max-w-md mx-auto">
-            <Button 
+            <DownloadDropdown 
               size="lg" 
               className="bg-foreground text-background hover:bg-foreground/90 transition-colors text-lg h-12 min-h-[48px]"
-              onClick={handleDownload}
-            >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .15V5.21L20 3zM3 13l6 .09v6.81l-6-1.15V13zm17 .25V22l-10-1.91v-6.84l10 .15z"/>
-              </svg>
-              Скачать
-            </Button>
+              buttonText="Скачать"
+            />
             <Button 
               size="lg" 
               variant="outline" 

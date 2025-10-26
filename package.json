@@ -6,13 +6,18 @@
   "scripts": {
     "setup": "node build-scripts/setup-env.js",
     "build": "node build-scripts/build-all.js",
+    "create-icons": "node build-scripts/create-icons.js",
     "build-desktop": "npm run setup && npm run build && cd electron && npm run build-win",
+    "build-desktop-mac": "npm run setup && npm run build && cd electron && npm run build-mac",
+    "build-desktop-all": "npm run setup && npm run build && cd electron && npm run build-all",
     "copy-installer": "node build-scripts/copy-installer.js",
     "dev": "concurrently \"cd backend && npm run dev\" \"cd client && npm run dev\"",
     "start": "cd electron && npm start",
     "install-deps": "npm install && cd backend && npm install && cd ../client && npm install && cd ../electron && npm install",
     "clean": "rimraf dist electron/dist backend/dist client/dist",
-    "package": "npm run build-desktop && npm run copy-installer"
+    "package": "npm run build-desktop && npm run copy-installer",
+    "package-mac": "npm run build-desktop-mac && npm run copy-installer",
+    "package-all": "npm run build-desktop-all && npm run copy-installer"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

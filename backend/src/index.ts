@@ -34,23 +34,30 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  session({
-    name: "session",
-    keys: [config.SESSION_SECRET],
-    maxAge: 24 * 60 * 60 * 1000,
-    // Use non-secure cookies on localhost (even if NODE_ENV=production) or when running Electron desktop
-    secure:
-      config.NODE_ENV === "production" &&
-      process.env.DESKTOP_APP !== "true" &&
-      // allow non-secure when FRONTEND_ORIGIN is localhost over http
-      !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN),
-    httpOnly: true,
-    // Use "none" for production cross-origin requests (Vercel <-> Railway)
-    // Use "lax" for localhost development
-    sameSite: config.NODE_ENV === "production" ? "none" : "lax",
-  })
-);
+const sessionConfig = {
+  name: "session",
+  keys: [config.SESSION_SECRET],
+  maxAge: 24 * 60 * 60 * 1000,
+  // Use non-secure cookies on localhost (even if NODE_ENV=production) or when running Electron desktop
+  secure:
+    config.NODE_ENV === "production" &&
+    process.env.DESKTOP_APP !== "true" &&
+    // allow non-secure when FRONTEND_ORIGIN is localhost over http
+    !/^http:\/\/localhost(?::\d+)?$/.test(config.FRONTEND_ORIGIN),
+  httpOnly: true,
+  // Use "none" for production cross-origin requests (Vercel <-> Railway)
+  // Use "lax" for localhost development
+  sameSite: config.NODE_ENV === "production" ? "none" : "lax",
+};
+
+console.log("Session config:", {
+  ...sessionConfig,
+  keys: "[REDACTED]",
+  NODE_ENV: config.NODE_ENV,
+  FRONTEND_ORIGIN: config.FRONTEND_ORIGIN,
+});
+
+app.use(session(sessionConfig as any));
 
 app.use(passport.initialize());
 app.use(passport.session());
